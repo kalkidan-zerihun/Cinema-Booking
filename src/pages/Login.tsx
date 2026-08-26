@@ -59,15 +59,15 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-[#12131d] border border-[#232535] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
         
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e50914] to-[#990000] flex items-center justify-center mx-auto shadow-lg shadow-red-950/60">
-            <Film className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto shadow-lg shadow-amber-950/50">
+            <Film className="w-6 h-6 text-slate-950" />
           </div>
-          <h1 className="text-2xl font-black text-white">Sign In to Kali Cinema</h1>
-          <p className="text-xs text-gray-400">
+          <h1 className="text-2xl font-black text-white">Sign In to Cinema</h1>
+          <p className="text-xs text-slate-400">
             Access your bookings, manage seats, and enjoy member perks.
           </p>
         </div>
@@ -82,7 +82,7 @@ export const Login: React.FC = () => {
             {email && (
               <Link
                 to={`/register?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirect)}`}
-                className="inline-flex items-center space-x-1 font-bold text-red-400 hover:text-red-300 pt-1 text-[11px] underline"
+                className="inline-flex items-center space-x-1 font-bold text-amber-400 hover:text-amber-300 pt-1 text-[11px] underline"
               >
                 <span>Register account with &quot;{email}&quot;</span>
                 <ArrowRight className="w-3 h-3" />
@@ -94,9 +94,9 @@ export const Login: React.FC = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-300 block">Email Address</label>
+            <label className="text-xs font-bold text-slate-300 block">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="email"
                 id="login-email-input"
@@ -104,15 +104,15 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-300 block">Password</label>
+            <label className="text-xs font-bold text-slate-300 block">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="password"
                 id="login-password-input"
@@ -120,7 +120,7 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export const Login: React.FC = () => {
             type="submit"
             id="login-submit-btn"
             disabled={submitting}
-            className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60 disabled:opacity-50"
+            className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-950/40 disabled:opacity-50"
           >
             {submitting && !loadingPreset ? (
               <span>Signing In...</span>
@@ -143,8 +143,8 @@ export const Login: React.FC = () => {
         </form>
 
         {/* 1-Click Demo Fast Sign-in */}
-        <div className="pt-3 border-t border-[#1e202e] space-y-2.5 text-center">
-          <span className="text-[11px] font-bold uppercase text-gray-400 block tracking-wider">
+        <div className="pt-3 border-t border-[#162035] space-y-2.5 text-center">
+          <span className="text-[11px] font-bold uppercase text-slate-400 block tracking-wider">
             1-Click Demo Sign In
           </span>
           <div className="grid grid-cols-2 gap-2.5">
@@ -153,9 +153,9 @@ export const Login: React.FC = () => {
               id="demo-customer-btn"
               disabled={submitting}
               onClick={() => handleDemoSignIn('guest@kalicinema.com', 'Cinema12345!', 'customer')}
-              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[#181926] text-gray-300 hover:text-white hover:bg-[#232537] border border-[#2a2d40] transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
+              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[#121c32] text-slate-300 hover:text-white hover:bg-[#192744] border border-[#1b263b] transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
             >
-              <UserCheck className="w-3.5 h-3.5 text-blue-400" />
+              <UserCheck className="w-3.5 h-3.5 text-amber-400" />
               <span>{loadingPreset === 'customer' ? 'Signing In...' : 'Customer Demo'}</span>
             </button>
             <button
@@ -163,20 +163,20 @@ export const Login: React.FC = () => {
               id="demo-admin-btn"
               disabled={submitting}
               onClick={() => handleDemoSignIn('admin@kalicinema.com', 'Admin12345!', 'admin')}
-              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-red-950/30 text-red-400 hover:text-red-300 hover:bg-red-900/40 border border-red-900/50 transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
+              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 border border-amber-500/30 transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
               <span>{loadingPreset === 'admin' ? 'Signing In...' : 'Admin Demo'}</span>
             </button>
           </div>
         </div>
 
         {/* Link to Register */}
-        <div className="text-center text-xs text-gray-400 pt-1">
+        <div className="text-center text-xs text-slate-400 pt-1">
           Don’t have an account?{' '}
           <Link
             to={`/register${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-            className="font-bold text-red-400 hover:text-red-300 underline underline-offset-2"
+            className="font-bold text-amber-400 hover:text-amber-300 underline underline-offset-2"
           >
             Create one now
           </Link>

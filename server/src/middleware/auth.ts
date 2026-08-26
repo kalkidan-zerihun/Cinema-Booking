@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { auth, db } from "../firebase.js";
-import { isAuthorizedAdminEmail } from "../utils/adminBootstrap.js";
+import { auth, db } from "../firebase.ts";
+import { isAuthorizedAdminEmail } from "../utils/adminBootstrap.ts";
 
 export interface AuthenticatedUser {
   uid: string;

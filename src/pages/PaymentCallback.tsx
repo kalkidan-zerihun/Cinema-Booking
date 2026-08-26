@@ -80,8 +80,8 @@ export const PaymentCallback: React.FC = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto my-16 p-8 bg-[#141522] border border-[#222432] rounded-3xl text-center space-y-4">
-      <div className="w-14 h-14 rounded-2xl bg-red-600/20 text-red-500 flex items-center justify-center mx-auto">
+    <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
+      <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
         {status === 'checking' && <Film className="w-7 h-7 animate-spin" />}
         {status === 'pending' && <Clock className="w-7 h-7 text-amber-400" />}
         {(status === 'failed' || status === 'error') && <XCircle className="w-7 h-7 text-red-400" />}
@@ -92,11 +92,11 @@ export const PaymentCallback: React.FC = () => {
         {status === 'failed' && 'Payment Not Successful'}
         {status === 'error' && 'Verification Error'}
       </h2>
-      <p className="text-xs text-gray-400">{message}</p>
+      <p className="text-xs text-slate-400">{message}</p>
       {reservationId && (
         <Link
           to={`/booking/${reservationId}`}
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#e50914] text-white"
+          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
         >
           <span>Back to Booking</span>
         </Link>

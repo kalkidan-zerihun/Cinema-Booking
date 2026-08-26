@@ -68,22 +68,22 @@ export const AdminUsers: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to="/admin"
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </Link>
           <h1 className="text-3xl font-black text-white">User Accounts & Roles</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             View registered cinema members and assign administrative authority privileges.
           </p>
         </div>
 
-        <span className="text-xs font-bold text-gray-400 bg-[#141522] px-4 py-2 rounded-xl border border-[#26283d]">
+        <span className="text-xs font-bold text-slate-400 bg-[#0d1424] px-4 py-2 rounded-xl border border-[#1b263b]">
           Total Registered Users: <strong className="text-white">{users.length}</strong>
         </span>
       </div>
@@ -105,21 +105,21 @@ export const AdminUsers: React.FC = () => {
 
       {/* Search Input */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search user by name or email..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#12131d] border border-[#232535] text-white text-xs focus:outline-none focus:border-red-500"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0d1424] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
         />
       </div>
 
       {/* Users Table */}
-      <div className="bg-[#12131d] border border-[#232535] rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-[#0d1424] border border-[#1b263b] rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-gray-300">
-            <thead className="bg-[#171926] text-gray-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#232535]">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="bg-[#121c32] text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#1b263b]">
               <tr>
                 <th className="px-5 py-3">Member</th>
                 <th className="px-5 py-3">Email & Phone</th>
@@ -128,25 +128,25 @@ export const AdminUsers: React.FC = () => {
                 <th className="px-5 py-3 text-right">Role Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1e202e]">
+            <tbody className="divide-y divide-[#162035]">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
                     Loading user accounts...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
                     No users found matching your search.
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((u) => (
-                  <tr key={u.uid} className="hover:bg-[#181a27]">
+                  <tr key={u.uid} className="hover:bg-[#121c32]">
                     <td className="px-5 py-3 font-bold text-white">
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-full bg-red-950 text-red-400 border border-red-800 flex items-center justify-center font-black text-xs">
+                        <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-black text-xs">
                           {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
                         </div>
                         <span>{u.name || 'Member'}</span>
@@ -154,22 +154,22 @@ export const AdminUsers: React.FC = () => {
                     </td>
                     <td className="px-5 py-3">
                       <div className="space-y-0.5">
-                        <span className="text-gray-200 block">{u.email}</span>
-                        {u.phone && <span className="text-gray-400 text-[11px] block">{u.phone}</span>}
+                        <span className="text-slate-200 block">{u.email}</span>
+                        {u.phone && <span className="text-slate-400 text-[11px] block">{u.phone}</span>}
                       </div>
                     </td>
                     <td className="px-5 py-3">
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           u.role === 'ADMIN'
-                            ? 'bg-red-950 text-red-400 border border-red-800'
-                            : 'bg-[#1b1c2b] text-gray-300 border border-[#2b2d42]'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            : 'bg-[#121c32] text-slate-300 border border-[#1b263b]'
                         }`}
                       >
                         {u.role || 'CUSTOMER'}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-gray-400">
+                    <td className="px-5 py-3 text-slate-400">
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="px-5 py-3 text-right">
@@ -177,8 +177,8 @@ export const AdminUsers: React.FC = () => {
                         onClick={() => handleChangeRole(u.uid, u.role || 'CUSTOMER', u.email)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                           u.role === 'ADMIN'
-                            ? 'bg-[#1a1c2a] text-gray-300 hover:text-white hover:bg-[#25283c] border border-[#2a2d40]'
-                            : 'bg-red-950/40 text-red-400 hover:bg-red-900/50 border border-red-900/60'
+                            ? 'bg-[#121c32] text-slate-300 hover:text-white hover:bg-[#192744] border border-[#1b263b]'
+                            : 'bg-amber-400 text-slate-950 hover:bg-amber-300'
                         }`}
                       >
                         {u.role === 'ADMIN' ? 'Demote to Customer' : 'Make Administrator'}

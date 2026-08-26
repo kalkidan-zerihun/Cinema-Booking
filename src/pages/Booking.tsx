@@ -133,25 +133,25 @@ export const Booking: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-red-600/20 text-red-500 flex items-center justify-center mx-auto animate-spin">
+        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
-        <p className="text-sm font-semibold text-gray-400">Loading your reservation details...</p>
+        <p className="text-sm font-semibold text-slate-400">Loading your reservation details...</p>
       </div>
     );
   }
 
   if (!reservation) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#141522] border border-[#222432] rounded-3xl text-center space-y-4">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
+        <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
         <h2 className="text-2xl font-bold text-white">Reservation Not Found</h2>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-slate-400">
           {errorMessage || 'The requested booking ID does not exist.'}
         </p>
         <Link
           to="/movies"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#e50914] text-white"
+          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
         >
           <span>Return to Movies</span>
         </Link>
@@ -169,7 +169,7 @@ export const Booking: React.FC = () => {
             <span>Reservation Confirmed & Secured</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white">Your Movie E-Pass is Ready!</h1>
-          <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
+          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
             Present your QR pass at the entrance. A digital copy has also been registered under your bookings.
           </p>
         </div>
@@ -179,7 +179,7 @@ export const Booking: React.FC = () => {
         <div className="text-center pt-4">
           <Link
             to="/my-reservations"
-            className="inline-flex items-center space-x-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+            className="inline-flex items-center space-x-2 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
           >
             <span>View All My Bookings</span>
             <ArrowRight className="w-4 h-4" />
@@ -193,14 +193,14 @@ export const Booking: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="space-y-1 pb-4 border-b border-[#202232]">
-        <span className="text-xs font-bold uppercase tracking-wider text-red-500">
+      <div className="space-y-1 pb-4 border-b border-[#162035]">
+        <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
           SECURE CHECKOUT & PAYMENT
         </span>
         <h1 className="text-2xl sm:text-3xl font-black text-white">
           Complete Your Reservation
         </h1>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-slate-400">
           Booking Reference #{reservation.bookingCode || reservation.id.slice(0, 8)}
         </p>
       </div>
@@ -217,7 +217,7 @@ export const Booking: React.FC = () => {
       <form onSubmit={handlePay} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Left 2 Cols: Payment Methods & Inputs */}
-        <div className="lg:col-span-2 bg-[#12131d] border border-[#232535] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="lg:col-span-2 bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
           <PaymentMethods
             selectedMethod={paymentMethod}
             onChangeMethod={setPaymentMethod}
@@ -235,11 +235,11 @@ export const Booking: React.FC = () => {
             type="submit"
             id="pay-now-btn"
             disabled={processing}
-            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-all duration-200 shadow-xl shadow-red-950/70 disabled:opacity-50"
+            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-all duration-200 shadow-xl shadow-amber-950/70 disabled:opacity-50"
           >
             {processing ? (
               <span className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <span className="w-4 h-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
                 <span>Processing Payment...</span>
               </span>
             ) : (
@@ -254,9 +254,9 @@ export const Booking: React.FC = () => {
         </div>
 
         {/* Right 1 Col: Summary Review */}
-        <div className="bg-[#12131d] border border-[#232535] rounded-3xl p-6 space-y-6 shadow-xl lg:sticky lg:top-28">
-          <div className="flex items-center space-x-2 pb-4 border-b border-[#1f212f]">
-            <Ticket className="w-5 h-5 text-red-500" />
+        <div className="bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 space-y-6 shadow-xl lg:sticky lg:top-28">
+          <div className="flex items-center space-x-2 pb-4 border-b border-[#162035]">
+            <Ticket className="w-5 h-5 text-amber-400" />
             <h3 className="text-base font-bold text-white">Order Summary</h3>
           </div>
 
@@ -265,47 +265,47 @@ export const Booking: React.FC = () => {
               <img
                 src={reservation.movie.posterUrl}
                 alt={reservation.movie.title}
-                className="w-16 h-24 object-cover rounded-lg border border-[#2a2c3d] shrink-0"
+                className="w-16 h-24 object-cover rounded-lg border border-[#1e2d4d] shrink-0"
               />
             )}
             <div className="space-y-1">
               <h4 className="text-sm font-bold text-white leading-tight">
                 {reservation.movie?.title}
               </h4>
-              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1d1f2d] text-red-400">
+              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#121c32] text-amber-400 border border-amber-500/30">
                 {reservation.showtime?.format || '2D'}
               </span>
-              <p className="text-xs text-gray-400">{reservation.movie?.duration} mins</p>
+              <p className="text-xs text-slate-400">{reservation.movie?.duration} mins</p>
             </div>
           </div>
 
-          <div className="space-y-3 pt-2 text-xs border-t border-[#1a1c28]">
-            <div className="flex items-center justify-between text-gray-300">
-              <span className="text-gray-400">Cinema:</span>
+          <div className="space-y-3 pt-2 text-xs border-t border-[#162035]">
+            <div className="flex items-center justify-between text-slate-300">
+              <span className="text-slate-400">Cinema:</span>
               <span className="font-semibold text-white">{reservation.cinema?.name}</span>
             </div>
-            <div className="flex items-center justify-between text-gray-300">
-              <span className="text-gray-400">Hall:</span>
+            <div className="flex items-center justify-between text-slate-300">
+              <span className="text-slate-400">Hall:</span>
               <span className="font-semibold text-white">{reservation.hall?.name}</span>
             </div>
-            <div className="flex items-center justify-between text-gray-300">
-              <span className="text-gray-400">Date:</span>
+            <div className="flex items-center justify-between text-slate-300">
+              <span className="text-slate-400">Date:</span>
               <span className="font-semibold text-white">{reservation.showtime?.date}</span>
             </div>
-            <div className="flex items-center justify-between text-gray-300">
-              <span className="text-gray-400">Showtime:</span>
+            <div className="flex items-center justify-between text-slate-300">
+              <span className="text-slate-400">Showtime:</span>
               <span className="font-semibold text-white">{reservation.showtime?.startTime}</span>
             </div>
-            <div className="flex items-center justify-between text-gray-300 pt-2 border-t border-[#1a1c28]">
-              <span className="text-gray-400">Selected Seats:</span>
-              <span className="font-bold text-red-400">{reservation.seatLabels.join(', ')}</span>
+            <div className="flex items-center justify-between text-slate-300 pt-2 border-t border-[#162035]">
+              <span className="text-slate-400">Selected Seats:</span>
+              <span className="font-bold text-amber-400">{reservation.seatLabels.join(', ')}</span>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1f212f] flex items-baseline justify-between">
-            <span className="text-sm font-bold text-gray-300">Amount Due:</span>
+          <div className="pt-4 border-t border-[#162035] flex items-baseline justify-between">
+            <span className="text-sm font-bold text-slate-300">Amount Due:</span>
             <span className="text-2xl font-black text-emerald-400">
-              {reservation.totalPrice} <span className="text-xs text-gray-300">ETB</span>
+              {reservation.totalPrice} <span className="text-xs text-slate-300">ETB</span>
             </span>
           </div>
         </div>

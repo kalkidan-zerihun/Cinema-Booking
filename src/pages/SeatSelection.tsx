@@ -159,10 +159,10 @@ export const SeatSelection: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-red-600/20 text-red-500 flex items-center justify-center mx-auto animate-spin">
+        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
-        <p className="text-sm font-semibold text-gray-400">
+        <p className="text-sm font-semibold text-slate-400">
           Connecting to real-time seat inventory for this showtime...
         </p>
       </div>
@@ -171,15 +171,15 @@ export const SeatSelection: React.FC = () => {
 
   if (!showtime) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#141522] border border-[#222432] rounded-3xl text-center space-y-4">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
+        <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
         <h2 className="text-2xl font-bold text-white">Showtime Not Available</h2>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-slate-400">
           {errorMessage || 'This showtime could not be loaded.'}
         </p>
         <Link
           to="/movies"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#e50914] text-white"
+          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Browse Other Showtimes</span>
@@ -192,11 +192,11 @@ export const SeatSelection: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
       {/* Top Breadcrumb & Showtime Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to={showtime.movieId ? `/movies/${showtime.movieId}` : '/movies'}
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-red-400 transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Movie Details</span>
@@ -204,31 +204,31 @@ export const SeatSelection: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-black text-white">
             {showtime.movie?.title || 'Movie'} — Seat Selection
           </h1>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-300">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
             <span className="flex items-center space-x-1">
-              <MapPin className="w-3.5 h-3.5 text-red-500" />
+              <MapPin className="w-3.5 h-3.5 text-amber-400" />
               <span>{showtime.cinema?.name}</span>
             </span>
             <span>•</span>
             <span className="flex items-center space-x-1">
-              <Film className="w-3.5 h-3.5 text-red-500" />
+              <Film className="w-3.5 h-3.5 text-amber-400" />
               <span>{showtime.hall?.name}</span>
             </span>
             <span>•</span>
             <span className="flex items-center space-x-1">
-              <Calendar className="w-3.5 h-3.5 text-red-500" />
+              <Calendar className="w-3.5 h-3.5 text-amber-400" />
               <span>{showtime.date}</span>
             </span>
             <span>•</span>
             <span className="flex items-center space-x-1">
-              <Clock className="w-3.5 h-3.5 text-red-500" />
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span>{showtime.startTime}</span>
             </span>
           </div>
         </div>
 
         {/* Live Protection Status */}
-        <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#141624] border border-[#26293d] text-xs text-gray-300">
+        <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#0d1424] border border-[#1b263b] text-xs text-slate-300">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>Atomic Concurrency Lock Enabled</span>
         </div>
@@ -272,7 +272,7 @@ export const SeatSelection: React.FC = () => {
             id="proceed-to-payment-btn"
             disabled={submitting || selectedSeats.length === 0}
             onClick={handleProceedToPayment}
-            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-all duration-200 shadow-xl shadow-red-950/70 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-all duration-200 shadow-xl shadow-amber-950/70 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
           >
             {submitting ? (
               <span>Securing Seat Locks...</span>
@@ -286,7 +286,7 @@ export const SeatSelection: React.FC = () => {
             )}
           </button>
 
-          <p className="text-[11px] text-center text-gray-400">
+          <p className="text-[11px] text-center text-slate-400">
             Selected seats will be reserved under your account upon proceeding.
           </p>
         </div>

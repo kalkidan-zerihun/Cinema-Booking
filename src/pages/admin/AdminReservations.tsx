@@ -144,22 +144,22 @@ export const AdminReservations: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to="/admin"
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </Link>
           <h1 className="text-3xl font-black text-white">Master Reservations Ledger</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             Real-time audit log of all customer ticket purchases, seat holds, and cancellations.
           </p>
         </div>
 
-        <span className="text-xs font-bold text-gray-400 bg-[#141522] px-4 py-2 rounded-xl border border-[#26283d]">
+        <span className="text-xs font-bold text-slate-400 bg-[#0d1424] px-4 py-2 rounded-xl border border-[#1b263b]">
           Total Bookings: <strong className="text-white">{reservations.length}</strong>
         </span>
       </div>
@@ -180,27 +180,27 @@ export const AdminReservations: React.FC = () => {
       )}
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#12131d] p-4 rounded-2xl border border-[#232535]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#0d1424] p-4 rounded-2xl border border-[#1b263b]">
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by code, customer name, email..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-xs focus:outline-none focus:border-red-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
           />
         </div>
 
-        <div className="flex items-center space-x-1.5 bg-[#171926] p-1 rounded-xl border border-[#2c2f42] w-full sm:w-auto justify-center">
+        <div className="flex items-center space-x-1.5 bg-[#121c32] p-1 rounded-xl border border-[#1b263b] w-full sm:w-auto justify-center">
           {(['ALL', 'CONFIRMED', 'PENDING', 'CANCELLED'] as const).map((st) => (
             <button
               key={st}
               onClick={() => setSelectedStatus(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 selectedStatus === st
-                  ? 'bg-[#e50914] text-white'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-amber-400 text-slate-950'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {st}
@@ -210,10 +210,10 @@ export const AdminReservations: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-[#12131d] border border-[#232535] rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-[#0d1424] border border-[#1b263b] rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-gray-300">
-            <thead className="bg-[#171926] text-gray-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#232535]">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="bg-[#121c32] text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#1b263b]">
               <tr>
                 <th className="px-5 py-3">Booking Code</th>
                 <th className="px-5 py-3">Customer</th>
@@ -224,24 +224,24 @@ export const AdminReservations: React.FC = () => {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1e202e]">
+            <tbody className="divide-y divide-[#162035]">
               {filtered.map((res) => (
-                <tr key={res.id} className="hover:bg-[#181a27]">
+                <tr key={res.id} className="hover:bg-[#121c32]">
                   <td className="px-5 py-3">
-                    <span className="font-mono font-bold text-red-400 block text-xs">
+                    <span className="font-mono font-bold text-amber-400 block text-xs">
                       #{res.bookingCode || res.id.slice(0, 8)}
                     </span>
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-[10px] text-slate-400">
                       {res.createdAt ? new Date(res.createdAt).toLocaleDateString() : ''}
                     </span>
                   </td>
                   <td className="px-5 py-3">
                     <span className="font-bold text-white block">{res.customerName}</span>
-                    <span className="text-gray-400 text-[11px] block">{res.customerEmail}</span>
+                    <span className="text-slate-400 text-[11px] block">{res.customerEmail}</span>
                   </td>
                   <td className="px-5 py-3">
-                    <span className="font-bold text-gray-200 block">{res.movie?.title || 'Movie'}</span>
-                    <span className="text-gray-400 text-[11px] block">
+                    <span className="font-bold text-slate-200 block">{res.movie?.title || 'Movie'}</span>
+                    <span className="text-slate-400 text-[11px] block">
                       {res.cinema?.name} • {res.showtime?.date} ({res.showtime?.startTime})
                     </span>
                   </td>

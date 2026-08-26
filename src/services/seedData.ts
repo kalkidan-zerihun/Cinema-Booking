@@ -5,10 +5,10 @@ import { Cinema, Hall, Movie, Showtime } from '../types';
 export const INITIAL_CINEMAS: Cinema[] = [
   {
     id: 'cinema-kali-addis-main',
-    name: 'Kali Cinema - Addis Ababa',
+    name: 'Cinema - Addis Ababa',
     location: 'Addis Ababa (Downtown Edna Mall)',
     address: 'Cameroon St, Bole Sub-City, Addis Ababa, Ethiopia',
-    description: 'The flagship Kali Cinema luxury cinema complex featuring 4K Laser projection, Dolby Atmos audio, and VIP recliner seats.',
+    description: 'The flagship Cinema luxury cinema complex featuring 4K Laser projection, Dolby Atmos audio, and VIP recliner seats.',
     imageUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80',
     phone: '+251 11 661 2233',
     amenities: ['Dolby Atmos', '4K Laser Projection', 'VIP Lounge', 'Gourmet Popcorn Bar', 'Parking'],
@@ -16,7 +16,7 @@ export const INITIAL_CINEMAS: Cinema[] = [
   },
   {
     id: 'cinema-kali-bole',
-    name: 'Kali Cinema - Bole Luxury',
+    name: 'Cinema - Bole Luxury',
     location: 'Bole Medhanealem, Addis Ababa',
     address: 'Near Medhanealem Cathedral, Addis Ababa, Ethiopia',
     description: 'An intimate premium cinema lounge with full in-seat dine-in service, acoustic velvet walls, and 7.1 surround sound.',
@@ -301,7 +301,7 @@ export const seedCinemaData = async (force: boolean = false): Promise<{ success:
 
     return {
       success: true,
-      message: 'Successfully seeded Kali Cinema with cinemas, halls, seats, movies, and showtimes!',
+      message: 'Successfully seeded Cinema with cinemas, halls, seats, movies, and showtimes!',
     };
   } catch (error: any) {
     console.warn('Error seeding cinema data:', error);

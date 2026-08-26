@@ -196,17 +196,17 @@ export const AdminShowtimes: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to="/admin"
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </Link>
           <h1 className="text-3xl font-black text-white">Showtime Scheduler</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             Schedule screening sessions, link movies to auditorium halls, and assign ticket price rates.
           </p>
         </div>
@@ -214,7 +214,7 @@ export const AdminShowtimes: React.FC = () => {
         <button
           onClick={openCreateModal}
           id="admin-add-showtime-btn"
-          className="flex items-center space-x-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60"
+          className="flex items-center space-x-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-950/40"
         >
           <Plus className="w-4 h-4" />
           <span>Schedule Showtime</span>
@@ -237,14 +237,14 @@ export const AdminShowtimes: React.FC = () => {
       )}
 
       {/* Filter Toolbar */}
-      <div className="flex flex-wrap items-center gap-4 bg-[#12131d] p-4 rounded-2xl border border-[#232535]">
+      <div className="flex flex-wrap items-center gap-4 bg-[#0d1424] p-4 rounded-2xl border border-[#1b263b]">
         <div className="flex items-center space-x-2">
-          <Film className="w-4 h-4 text-red-500" />
-          <span className="text-xs text-gray-400 font-semibold">Movie:</span>
+          <Film className="w-4 h-4 text-amber-400" />
+          <span className="text-xs text-slate-400 font-semibold">Movie:</span>
           <select
             value={filterMovieId}
             onChange={(e) => setFilterMovieId(e.target.value)}
-            className="bg-[#171926] border border-[#2c2f42] text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-500 cursor-pointer"
+            className="bg-[#121c32] border border-[#1b263b] text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-amber-400 cursor-pointer"
           >
             <option value="ALL">All Movies</option>
             {movies.map((m) => (
@@ -256,12 +256,12 @@ export const AdminShowtimes: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Building className="w-4 h-4 text-blue-500" />
-          <span className="text-xs text-gray-400 font-semibold">Cinema:</span>
+          <Building className="w-4 h-4 text-blue-400" />
+          <span className="text-xs text-slate-400 font-semibold">Cinema:</span>
           <select
             value={filterCinemaId}
             onChange={(e) => setFilterCinemaId(e.target.value)}
-            className="bg-[#171926] border border-[#2c2f42] text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-500 cursor-pointer"
+            className="bg-[#121c32] border border-[#1b263b] text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-amber-400 cursor-pointer"
           >
             <option value="ALL">All Cinemas</option>
             {cinemas.map((c) => (
@@ -274,10 +274,10 @@ export const AdminShowtimes: React.FC = () => {
       </div>
 
       {/* Showtimes Table */}
-      <div className="bg-[#12131d] border border-[#232535] rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-[#0d1424] border border-[#1b263b] rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-gray-300">
-            <thead className="bg-[#171926] text-gray-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#232535]">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="bg-[#121c32] text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-[#1b263b]">
               <tr>
                 <th className="px-5 py-3">Movie</th>
                 <th className="px-5 py-3">Venue & Hall</th>
@@ -287,16 +287,16 @@ export const AdminShowtimes: React.FC = () => {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1e202e]">
+            <tbody className="divide-y divide-[#162035]">
               {filteredShowtimes.map((st) => (
-                <tr key={st.id} className="hover:bg-[#181a27]">
+                <tr key={st.id} className="hover:bg-[#121c32]">
                   <td className="px-5 py-3">
                     <div className="flex items-center space-x-2.5">
                       {st.movie?.posterUrl && (
                         <img
                           src={st.movie.posterUrl}
                           alt={st.movie.title}
-                          className="w-8 h-11 object-cover rounded bg-[#202232]"
+                          className="w-8 h-11 object-cover rounded bg-[#162035]"
                         />
                       )}
                       <span className="font-bold text-white text-sm">{st.movie?.title || 'Unknown Title'}</span>
@@ -304,20 +304,20 @@ export const AdminShowtimes: React.FC = () => {
                   </td>
                   <td className="px-5 py-3">
                     <div className="space-y-0.5">
-                      <span className="font-semibold text-gray-200 block">{st.cinema?.name}</span>
-                      <span className="text-gray-400 text-[11px] block">{st.hall?.name}</span>
+                      <span className="font-semibold text-slate-200 block">{st.cinema?.name}</span>
+                      <span className="text-slate-400 text-[11px] block">{st.hall?.name}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3">
                     <div className="space-y-0.5">
                       <span className="font-bold text-white block">{st.date}</span>
-                      <span className="text-red-400 font-mono font-semibold block">
+                      <span className="text-amber-400 font-mono font-semibold block">
                         {st.startTime} {st.endTime ? `– ${st.endTime}` : ''}
                       </span>
                     </div>
                   </td>
                   <td className="px-5 py-3">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#1b1c2b] text-gray-300 border border-[#2b2d42]">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#121c32] text-slate-300 border border-[#1b263b]">
                       {st.format || '2D'}
                     </span>
                   </td>
@@ -329,19 +329,19 @@ export const AdminShowtimes: React.FC = () => {
                       <Link
                         to={`/showtimes/${st.id}/seats`}
                         title="View Seat Map"
-                        className="px-2.5 py-1 rounded-lg bg-[#1a1c2a] text-xs font-semibold text-gray-300 hover:text-white"
+                        className="px-2.5 py-1 rounded-lg bg-[#121c32] text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#192744]"
                       >
                         Seat Map
                       </Link>
                       <button
                         onClick={() => openEditModal(st)}
-                        className="p-1.5 rounded-lg bg-[#1a1c2a] text-blue-400 hover:text-blue-300"
+                        className="p-1.5 rounded-lg bg-[#121c32] text-amber-400 hover:text-amber-300 hover:bg-[#192744]"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(st.id)}
-                        className="p-1.5 rounded-lg bg-[#1a1c2a] text-red-400 hover:text-red-300"
+                        className="p-1.5 rounded-lg bg-[#121c32] text-red-400 hover:text-red-300 hover:bg-[#192744]"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -357,14 +357,14 @@ export const AdminShowtimes: React.FC = () => {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#141522] border border-[#26283d] rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#222435]">
+          <div className="bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-[#162035]">
               <h2 className="text-xl font-black text-white">
                 {editingShowtime ? 'Edit Showtime Session' : 'Schedule New Showtime'}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-gray-400 hover:text-white p-1"
+                className="text-slate-400 hover:text-white p-1"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -372,12 +372,12 @@ export const AdminShowtimes: React.FC = () => {
 
             <form onSubmit={handleSave} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Select Movie *</label>
+                <label className="text-xs font-bold text-slate-300">Select Movie *</label>
                 <select
                   required
                   value={movieId}
                   onChange={(e) => setMovieId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
                 >
                   {movies.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -389,7 +389,7 @@ export const AdminShowtimes: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Cinema Venue *</label>
+                  <label className="text-xs font-bold text-slate-300">Cinema Venue *</label>
                   <select
                     required
                     value={cinemaId}
@@ -399,7 +399,7 @@ export const AdminShowtimes: React.FC = () => {
                       const matchingHall = halls.find((h) => h.cinemaId === newCinemaId);
                       if (matchingHall) setHallId(matchingHall.id);
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
                   >
                     {cinemas.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -410,12 +410,12 @@ export const AdminShowtimes: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Auditorium Hall *</label>
+                  <label className="text-xs font-bold text-slate-300">Auditorium Hall *</label>
                   <select
                     required
                     value={hallId}
                     onChange={(e) => setHallId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
                   >
                     {availableHallsInModal.map((h) => (
                       <option key={h.id} value={h.id}>
@@ -428,41 +428,41 @@ export const AdminShowtimes: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Date *</label>
+                  <label className="text-xs font-bold text-slate-300">Date *</label>
                   <input
                     type="date"
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Start Time *</label>
+                  <label className="text-xs font-bold text-slate-300">Start Time *</label>
                   <input
                     type="time"
                     required
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">End Time</label>
+                  <label className="text-xs font-bold text-slate-300">End Time</label>
                   <input
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Base Ticket Price (ETB) *</label>
+                  <label className="text-xs font-bold text-slate-300">Base Ticket Price (ETB) *</label>
                   <input
                     type="number"
                     min={50}
@@ -471,45 +471,45 @@ export const AdminShowtimes: React.FC = () => {
                     required
                     value={ticketPrice}
                     onChange={(e) => setTicketPrice(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-300">Projection Format</label>
+                  <label className="text-xs font-bold text-slate-300">Projection Format</label>
                   <input
                     type="text"
                     value={format}
                     onChange={(e) => setFormat(e.target.value)}
                     placeholder="2D Laser, IMAX 3D, Dolby Vision"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Audio / Subtitle Track</label>
+                <label className="text-xs font-bold text-slate-300">Audio / Subtitle Track</label>
                 <input
                   type="text"
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                   placeholder="English with Amharic Subtitles"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[#222435]">
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[#162035]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#1a1c2a] text-gray-400 hover:text-white"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#121c32] text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase bg-[#e50914] text-white hover:bg-red-600 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase bg-amber-400 text-slate-950 hover:bg-amber-300 disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : 'Save Showtime'}
                 </button>

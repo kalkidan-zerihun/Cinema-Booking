@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
-import { db, auth } from "../firebase.js";
-import { authenticate, AuthenticatedRequest } from "../middleware/auth.js";
-import { isAuthorizedAdminEmail, bootstrapAdminUsers, PRESET_ACCOUNTS } from "../utils/adminBootstrap.js";
+import { db, auth } from "../firebase.ts";
+import { authenticate, AuthenticatedRequest } from "../middleware/auth.ts";
+import { isAuthorizedAdminEmail, bootstrapAdminUsers, PRESET_ACCOUNTS } from "../utils/adminBootstrap.ts";
 
 const router = Router();
 

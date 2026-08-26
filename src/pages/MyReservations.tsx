@@ -92,28 +92,28 @@ export const MyReservations: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
-          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-red-500">
+          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Ticket className="w-4 h-4" />
             <span>MEMBER ADMISSION PORTAL</span>
           </div>
           <h1 className="text-3xl font-black text-white">My Movie Bookings</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             Access your active digital tickets, admission passes, and reservation history.
           </p>
         </div>
 
         {/* Status Filter */}
-        <div className="flex items-center space-x-1.5 bg-[#141520] p-1 rounded-xl border border-[#232535]">
+        <div className="flex items-center space-x-1.5 bg-[#0d1424] p-1 rounded-xl border border-[#1b263b]">
           {(['ALL', 'CONFIRMED', 'PENDING', 'CANCELLED'] as const).map((status) => (
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 selectedStatus === status
-                  ? 'bg-[#e50914] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {status}
@@ -147,7 +147,7 @@ export const MyReservations: React.FC = () => {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-44 rounded-2xl bg-[#141520] animate-pulse border border-[#222432]"
+              className="h-44 rounded-2xl bg-[#0d1424] animate-pulse border border-[#1b263b]"
             />
           ))}
         </div>
@@ -162,11 +162,11 @@ export const MyReservations: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="p-16 text-center bg-[#12131d] border border-[#222432] rounded-3xl space-y-4">
-          <Ticket className="w-12 h-12 text-gray-600 mx-auto" />
+        <div className="p-16 text-center bg-[#0d1424] border border-[#1b263b] rounded-3xl space-y-4">
+          <Ticket className="w-12 h-12 text-slate-600 mx-auto" />
           <div className="space-y-1">
             <h3 className="text-lg font-bold text-white">No bookings found</h3>
-            <p className="text-xs text-gray-400 max-w-sm mx-auto">
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
               {selectedStatus !== 'ALL'
                 ? `You have no ${selectedStatus.toLowerCase()} bookings.`
                 : 'You haven’t reserved any tickets yet. Explore movies to book your night!'}
@@ -174,7 +174,7 @@ export const MyReservations: React.FC = () => {
           </div>
           <Link
             to="/movies"
-            className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/50"
+            className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-colors shadow-lg shadow-amber-950/50"
           >
             <Film className="w-4 h-4" />
             <span>Browse Now Showing</span>

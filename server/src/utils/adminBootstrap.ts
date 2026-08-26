@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js";
+import { auth, db } from "../firebase.ts";
 
 /**
  * List of authorized admin emails.
@@ -12,7 +12,7 @@ export function getAuthorizedAdminEmails(): string[] {
     .map((e) => e.trim().toLowerCase())
     .filter((e) => e.length > 0);
 
-  const defaults = ["admin@kalicinema.com", "admin@example.com"];
+  const defaults = ["admin@kalicinema.com", "admin@example.com", "k98978kli@gmail.com"];
   return Array.from(new Set([...defaults, ...parsed]));
 }
 

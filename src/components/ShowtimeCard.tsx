@@ -11,12 +11,12 @@ export const ShowtimeCard: React.FC<ShowtimeCardProps> = ({ showtime }) => {
   const isVipFormat = showtime.format?.includes('IMAX') || showtime.format?.includes('4DX');
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-[#141520] border border-[#232534] hover:border-red-600/40 transition-all duration-200 gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-[#0d1424] border border-[#1b263b] hover:border-amber-400/50 transition-all duration-200 gap-4">
       {/* Time and Info */}
       <div className="flex items-center space-x-4">
-        <div className="flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-[#1d1f2d] border border-[#2d3042] shrink-0">
+        <div className="flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-[#121c32] border border-[#1e2d4d] shrink-0">
           <span className="text-lg font-black text-white">{showtime.startTime}</span>
-          <span className="text-[10px] uppercase font-bold text-red-400">
+          <span className="text-[10px] uppercase font-bold text-amber-400">
             {showtime.format || '2D'}
           </span>
         </div>
@@ -34,9 +34,9 @@ export const ShowtimeCard: React.FC<ShowtimeCardProps> = ({ showtime }) => {
             )}
           </div>
 
-          <div className="flex items-center space-x-2 text-xs text-gray-400">
-            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-            <span className="truncate">{showtime.cinema?.name || 'Kali Cinema'}</span>
+          <div className="flex items-center space-x-2 text-xs text-slate-400">
+            <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="truncate">{showtime.cinema?.name || 'Cinema'}</span>
             <span>•</span>
             <span>{showtime.date}</span>
           </div>
@@ -44,18 +44,18 @@ export const ShowtimeCard: React.FC<ShowtimeCardProps> = ({ showtime }) => {
       </div>
 
       {/* Price & Select Seats Button */}
-      <div className="flex items-center justify-between sm:justify-end space-x-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#222432]">
+      <div className="flex items-center justify-between sm:justify-end space-x-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1a253a]">
         <div className="text-left sm:text-right">
-          <span className="text-xs text-gray-400 block">Ticket Price</span>
-          <span className="text-base font-black text-emerald-400">
-            {showtime.ticketPrice} <span className="text-xs font-semibold text-gray-300">ETB</span>
+          <span className="text-xs text-slate-400 block">Ticket Price</span>
+          <span className="text-base font-black text-amber-300">
+            {showtime.ticketPrice} <span className="text-xs font-semibold text-slate-400">ETB</span>
           </span>
         </div>
 
         <Link
           to={`/showtimes/${showtime.id}/seats`}
           id={`select-seats-btn-${showtime.id}`}
-          className="flex items-center space-x-1.5 px-4 py-2.5 rounded-lg text-sm font-bold bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-md shadow-red-950/40 shrink-0"
+          className="flex items-center space-x-1.5 px-4 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-colors shadow-md shadow-amber-950/40 shrink-0"
         >
           <Ticket className="w-4 h-4" />
           <span>Select Seats</span>

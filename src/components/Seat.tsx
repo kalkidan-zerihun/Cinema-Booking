@@ -19,22 +19,22 @@ export const Seat: React.FC<SeatComponentProps> = ({ seat, state, onToggle }) =>
 
   if (state === 'RESERVED') {
     containerStyles =
-      'bg-[#1a1215] border-[#381a20] text-gray-600 cursor-not-allowed opacity-60';
-    contentColor = 'text-gray-600';
+      'bg-[#0a0e1a] border-[#151c2d] text-slate-600 cursor-not-allowed opacity-50';
+    contentColor = 'text-slate-600';
   } else if (state === 'SELECTED') {
     containerStyles =
-      'bg-[#e50914] border-red-400 text-white shadow-lg shadow-red-900/60 scale-105 ring-2 ring-red-400/40';
-    contentColor = 'text-white font-black';
+      'bg-gradient-to-br from-amber-400 to-amber-500 border-amber-300 text-slate-950 shadow-lg shadow-amber-500/30 scale-105 ring-2 ring-amber-300/50';
+    contentColor = 'text-slate-950 font-black';
   } else {
     // AVAILABLE
     if (isVip) {
       containerStyles =
-        'bg-[#191824] border-amber-500/40 text-amber-200 hover:bg-amber-950/40 hover:border-amber-400 cursor-pointer';
+        'bg-[#121d33] border-amber-500/50 text-amber-300 hover:bg-amber-950/40 hover:border-amber-400 cursor-pointer';
       contentColor = 'text-amber-300';
     } else {
       containerStyles =
-        'bg-[#181a24] border-[#292c3d] text-gray-300 hover:bg-[#252838] hover:border-red-500/60 hover:text-white cursor-pointer';
-      contentColor = 'text-gray-300';
+        'bg-[#0f172a] border-[#1e293b] text-slate-300 hover:bg-[#19243d] hover:border-amber-400/80 hover:text-white cursor-pointer';
+      contentColor = 'text-slate-300';
     }
   }
 
@@ -49,7 +49,7 @@ export const Seat: React.FC<SeatComponentProps> = ({ seat, state, onToggle }) =>
     >
       {/* Tiny VIP badge */}
       {isVip && state !== 'SELECTED' && state !== 'RESERVED' && (
-        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 flex items-center justify-center text-[7px] text-black">
+        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 flex items-center justify-center text-[7px] text-slate-950 font-bold">
           ★
         </span>
       )}
@@ -59,10 +59,11 @@ export const Seat: React.FC<SeatComponentProps> = ({ seat, state, onToggle }) =>
       </span>
       
       <Armchair
-        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 opacity-60 ${
-          state === 'SELECTED' ? 'text-white opacity-95' : contentColor
+        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 opacity-70 ${
+          state === 'SELECTED' ? 'text-slate-950 opacity-100' : contentColor
         }`}
       />
     </button>
   );
 };
+

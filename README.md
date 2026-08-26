@@ -1,4 +1,4 @@
-# Kali Cinema
+# Cinema
 
 Real-time online movie ticket reservation and interactive seat-selection platform for local
 cinemas in Ethiopia. Built with React + TypeScript + Vite on Firebase (Auth, Firestore, Cloud

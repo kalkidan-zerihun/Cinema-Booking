@@ -57,15 +57,15 @@ export const Register: React.FC = () => {
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-[#12131d] border border-[#232535] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
         
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e50914] to-[#990000] flex items-center justify-center mx-auto shadow-lg shadow-red-950/60">
-            <Film className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto shadow-lg shadow-amber-950/50">
+            <Film className="w-6 h-6 text-slate-950" />
           </div>
-          <h1 className="text-2xl font-black text-white">Join Kali Cinema</h1>
-          <p className="text-xs text-gray-400">
+          <h1 className="text-2xl font-black text-white">Sign Up for Cinema</h1>
+          <p className="text-xs text-slate-400">
             Create an account to reserve seats, save booking passes, and view exclusive showtimes.
           </p>
         </div>
@@ -81,9 +81,9 @@ export const Register: React.FC = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-300 block">Full Name *</label>
+            <label className="text-xs font-bold text-slate-300 block">Full Name *</label>
             <div className="relative">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="text"
                 id="register-name-input"
@@ -91,15 +91,15 @@ export const Register: React.FC = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Abebe Kebede"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-300 block">Email Address *</label>
+            <label className="text-xs font-bold text-slate-300 block">Email Address *</label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="email"
                 id="register-email-input"
@@ -107,31 +107,31 @@ export const Register: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-300 block">Phone Number (Optional)</label>
+            <label className="text-xs font-bold text-slate-300 block">Phone Number (Optional)</label>
             <div className="relative">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="tel"
                 id="register-phone-input"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+251 91 123 4567"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-gray-300 block">Password *</label>
+              <label className="text-xs font-bold text-slate-300 block">Password *</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="password"
                   id="register-password-input"
@@ -139,15 +139,15 @@ export const Register: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-gray-300 block">Confirm Password *</label>
+              <label className="text-xs font-bold text-slate-300 block">Confirm Password *</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="password"
                   id="register-confirm-password-input"
@@ -155,7 +155,7 @@ export const Register: React.FC = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#171926] border border-[#2c2f42] text-white text-sm focus:outline-none focus:border-red-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-sm focus:outline-none focus:border-amber-400"
                 />
               </div>
             </div>
@@ -165,7 +165,7 @@ export const Register: React.FC = () => {
             type="submit"
             id="register-submit-btn"
             disabled={submitting}
-            className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60 disabled:opacity-50"
+            className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-950/40 disabled:opacity-50"
           >
             {submitting ? (
               <span>Creating Account...</span>
@@ -179,11 +179,11 @@ export const Register: React.FC = () => {
         </form>
 
         {/* Link to Login */}
-        <div className="text-center text-xs text-gray-400 pt-2 border-t border-[#1e202e]">
+        <div className="text-center text-xs text-slate-400 pt-2 border-t border-[#162035]">
           Already have an account?{' '}
           <Link
             to={`/login${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-            className="font-bold text-red-400 hover:text-red-300 underline underline-offset-2"
+            className="font-bold text-amber-400 hover:text-amber-300 underline underline-offset-2"
           >
             Sign in here
           </Link>

@@ -1,8 +1,8 @@
 import { Router, Request, Response } from "express";
 import { Timestamp, FieldValue } from "firebase-admin/firestore";
-import { db } from "../firebase.js";
-import { authenticate, AuthenticatedRequest } from "../middleware/auth.js";
-import { initializeChapaPayment, verifyChapaPayment } from "../services/chapa.js";
+import { db } from "../firebase.ts";
+import { authenticate, AuthenticatedRequest } from "../middleware/auth.ts";
+import { initializeChapaPayment, verifyChapaPayment } from "../services/chapa.ts";
 
 const router = Router();
 

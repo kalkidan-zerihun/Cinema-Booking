@@ -159,29 +159,29 @@ export const AdminSeats: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to="/admin/halls"
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Auditoriums</span>
           </Link>
           <h1 className="text-3xl font-black text-white">Seat Layout & Generator</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             Generate physical seating matrices, assign VIP rows, and calibrate price multipliers.
           </p>
         </div>
 
         {/* Hall Selector */}
-        <div className="flex items-center space-x-2 bg-[#12131d] p-2 rounded-xl border border-[#232535]">
-          <Tv className="w-4 h-4 text-red-500 ml-1" />
-          <span className="text-xs text-gray-400 font-semibold">Auditorium:</span>
+        <div className="flex items-center space-x-2 bg-[#0d1424] p-2 rounded-xl border border-[#1b263b]">
+          <Tv className="w-4 h-4 text-amber-400 ml-1" />
+          <span className="text-xs text-slate-400 font-semibold">Auditorium:</span>
           <select
             value={selectedHallId}
             onChange={(e) => setSelectedHallId(e.target.value)}
-            className="bg-[#171926] border border-[#2c2f42] text-white text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-red-500 cursor-pointer"
+            className="bg-[#121c32] border border-[#1b263b] text-white text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-amber-400 cursor-pointer"
           >
             {halls.map((h) => (
               <option key={h.id} value={h.id}>
@@ -210,12 +210,12 @@ export const AdminSeats: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Left Column: Visual Seat Map */}
-        <div className="lg:col-span-2 bg-[#12131d] border border-[#232535] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="lg:col-span-2 bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h2 className="text-base font-bold text-white">Physical Seating Grid</h2>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-slate-400">
                 Click any seat to cycle its tier (Standard → Premium → VIP → Couple → Wheelchair)
               </p>
             </div>
@@ -226,8 +226,8 @@ export const AdminSeats: React.FC = () => {
 
           {/* Screen Canvas Curve */}
           <div className="w-full flex flex-col items-center py-4">
-            <div className="w-3/4 h-2 bg-gradient-to-r from-red-600/30 via-red-500 to-red-600/30 rounded-full shadow-[0_0_15px_rgba(229,9,20,0.6)]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500 mt-2">
+            <div className="w-3/4 h-2 bg-gradient-to-r from-amber-500/20 via-amber-400 to-amber-500/20 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-2">
               4K Laser Curved Projection Screen
             </span>
           </div>
@@ -235,7 +235,7 @@ export const AdminSeats: React.FC = () => {
           {/* Seat Grid */}
           {loading ? (
             <div className="h-64 flex items-center justify-center">
-              <RefreshCw className="w-6 h-6 text-red-500 animate-spin" />
+              <RefreshCw className="w-6 h-6 text-amber-400 animate-spin" />
             </div>
           ) : seats.length > 0 ? (
             <div className="space-y-3 overflow-x-auto pb-4">
@@ -243,11 +243,11 @@ export const AdminSeats: React.FC = () => {
                 const rowSeats = (rowsMap.get(rowName) || []).sort((a, b) => a.number - b.number);
                 return (
                   <div key={rowName} className="flex items-center justify-center space-x-2">
-                    <span className="w-6 text-center text-xs font-bold text-gray-500">{rowName}</span>
+                    <span className="w-6 text-center text-xs font-bold text-slate-500">{rowName}</span>
                     <div className="flex items-center space-x-2">
                       {rowSeats.map((seat) => {
-                        let bg = 'bg-[#1b1d2b] border-[#31354c] text-gray-300';
-                        if (seat.type === 'VIP') bg = 'bg-amber-600/30 border-amber-500/60 text-amber-300';
+                        let bg = 'bg-[#121c32] border-[#1b263b] text-slate-300';
+                        if (seat.type === 'VIP') bg = 'bg-amber-500/20 border-amber-400 text-amber-300';
                         if (seat.type === 'PREMIUM') bg = 'bg-blue-600/30 border-blue-500/60 text-blue-300';
                         if (seat.type === 'COUPLE') bg = 'bg-pink-600/30 border-pink-500/60 text-pink-300';
                         if (seat.type === 'WHEELCHAIR') bg = 'bg-emerald-600/30 border-emerald-500/60 text-emerald-300';
@@ -266,25 +266,25 @@ export const AdminSeats: React.FC = () => {
                         );
                       })}
                     </div>
-                    <span className="w-6 text-center text-xs font-bold text-gray-500">{rowName}</span>
+                    <span className="w-6 text-center text-xs font-bold text-slate-500">{rowName}</span>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="p-10 text-center bg-[#171926] rounded-2xl border border-dashed border-[#2b2d42] space-y-2">
-              <Armchair className="w-8 h-8 text-gray-600 mx-auto" />
+            <div className="p-10 text-center bg-[#121c32] rounded-2xl border border-dashed border-[#1b263b] space-y-2">
+              <Armchair className="w-8 h-8 text-slate-600 mx-auto" />
               <p className="text-sm font-bold text-white">No Seats Configured</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-slate-400">
                 Use the Seat Generator tool on the right to automatically create a seating layout for this hall.
               </p>
             </div>
           )}
 
           {/* Legend */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-[#1e202e] text-[11px] text-gray-400">
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-[#162035] text-[11px] text-slate-400">
             <span className="flex items-center space-x-1.5">
-              <span className="w-3 h-3 rounded bg-[#1b1d2b] border border-[#31354c]" />
+              <span className="w-3 h-3 rounded bg-[#121c32] border border-[#1b263b]" />
               <span>Standard (1.0x)</span>
             </span>
             <span className="flex items-center space-x-1.5">
@@ -292,7 +292,7 @@ export const AdminSeats: React.FC = () => {
               <span>Premium (1.15x)</span>
             </span>
             <span className="flex items-center space-x-1.5">
-              <span className="w-3 h-3 rounded bg-amber-600/30 border border-amber-500" />
+              <span className="w-3 h-3 rounded bg-amber-500/20 border border-amber-400" />
               <span>VIP Recliner (1.35x)</span>
             </span>
             <span className="flex items-center space-x-1.5">
@@ -303,14 +303,14 @@ export const AdminSeats: React.FC = () => {
         </div>
 
         {/* Right Column: Bulk Matrix Generator */}
-        <div className="bg-[#12131d] border border-[#232535] rounded-3xl p-6 space-y-6 shadow-2xl">
-          <div className="space-y-1 pb-3 border-b border-[#202232]">
-            <div className="flex items-center space-x-2 text-red-500 font-bold text-xs">
+        <div className="bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 space-y-6 shadow-2xl">
+          <div className="space-y-1 pb-3 border-b border-[#162035]">
+            <div className="flex items-center space-x-2 text-amber-400 font-bold text-xs">
               <Sliders className="w-4 h-4" />
               <span>GENERATOR TOOL</span>
             </div>
             <h3 className="text-lg font-black text-white">Bulk Matrix Builder</h3>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               Instantly create grid rows, numbers, and tier mappings.
             </p>
           </div>
@@ -318,31 +318,31 @@ export const AdminSeats: React.FC = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Number of Rows</label>
+                <label className="text-xs font-bold text-slate-300">Number of Rows</label>
                 <input
                   type="number"
                   min={1}
                   max={20}
                   value={rowCount}
                   onChange={(e) => setRowCount(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-[#171926] border border-[#2b2d42] text-white text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Seats per Row</label>
+                <label className="text-xs font-bold text-slate-300">Seats per Row</label>
                 <input
                   type="number"
                   min={1}
                   max={30}
                   value={seatsPerRow}
                   onChange={(e) => setSeatsPerRow(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-[#171926] border border-[#2b2d42] text-white text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-gray-300">
+              <label className="text-xs font-bold text-slate-300">
                 VIP Recliner Rows (1.35x Price)
               </label>
               <input
@@ -350,12 +350,12 @@ export const AdminSeats: React.FC = () => {
                 value={vipRowsInput}
                 onChange={(e) => setVipRowsInput(e.target.value)}
                 placeholder="e.g. E, F"
-                className="w-full px-3 py-2 rounded-xl bg-[#171926] border border-[#2b2d42] text-white text-xs"
+                className="w-full px-3 py-2 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-gray-300">
+              <label className="text-xs font-bold text-slate-300">
                 Premium Rows (1.15x Price)
               </label>
               <input
@@ -363,13 +363,13 @@ export const AdminSeats: React.FC = () => {
                 value={premiumRowsInput}
                 onChange={(e) => setPremiumRowsInput(e.target.value)}
                 placeholder="e.g. C, D"
-                className="w-full px-3 py-2 rounded-xl bg-[#171926] border border-[#2b2d42] text-white text-xs"
+                className="w-full px-3 py-2 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs"
               />
             </div>
 
-            <div className="p-3 bg-[#171926] rounded-xl text-xs text-gray-400 space-y-1">
+            <div className="p-3 bg-[#121c32] rounded-xl text-xs text-slate-400 space-y-1">
               <span>Will generate: <strong>{Number(rowCount) * Number(seatsPerRow)} Total Seats</strong></span>
-              <span className="block text-[11px] text-gray-500">
+              <span className="block text-[11px] text-slate-500">
                 Rows: A through {String.fromCharCode(65 + Number(rowCount) - 1)}
               </span>
             </div>
@@ -379,7 +379,7 @@ export const AdminSeats: React.FC = () => {
               id="admin-generate-seats-btn"
               disabled={generating}
               onClick={handleGenerateSeats}
-              className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60 disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-950/40 disabled:opacity-50"
             >
               {generating ? (
                 <span>Generating Layout...</span>

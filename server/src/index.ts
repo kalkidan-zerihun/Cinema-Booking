@@ -1,41 +1,43 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { db } from "./firebase.js";
-import reservationRouter, { expirePendingReservationsTask } from "./routes/reservation.js";
-import paymentsRouter from "./routes/payments.js";
-import adminRouter from "./routes/admin.js";
-import { bootstrapAdminUsers } from "./utils/adminBootstrap.js";
+import { db } from "./firebase.ts";
+import reservationRouter, { expirePendingReservationsTask } from "./routes/reservation.ts";
+import paymentsRouter from "./routes/payments.ts";
+import adminRouter from "./routes/admin.ts";
+import authRouter from "./routes/auth.ts";
+import { bootstrapAdminUsers } from "./utils/adminBootstrap.ts";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Health Endpoint - Protected Existing Feature
+// Health Endpoint
 app.get("/api/health", async (_req, res) => {
+  let firebaseStatus = "ready";
   try {
-    await db.collection("movies").limit(1).get();
-
-    res.json({
-      status: "OK",
-      message: "Cinema API is healthy",
-      firebase: "connected",
-    });
-  } catch (error) {
-    console.error("Firebase error:", error);
-
-    res.status(500).json({
-      status: "ERROR",
-      message: "Firebase connection failed",
-    });
+    if (db) {
+      firebaseStatus = "connected";
+    }
+  } catch {
+    firebaseStatus = "unreachable";
   }
+
+  res.json({
+    status: "OK",
+    message: "Kali Cinema API is online",
+    firebase: firebaseStatus,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // API Routes
-app.use("/api/reservations", reservationRouter);
-app.use("/api/payments", paymentsRouter);
-app.use("/api/admin", adminRouter);
+const getRouter = (r: any) => (r && typeof r === "object" && "default" in r ? r.default : r);
+app.use("/api/auth", getRouter(authRouter));
+app.use("/api/reservations", getRouter(reservationRouter));
+app.use("/api/payments", getRouter(paymentsRouter));
+app.use("/api/admin", getRouter(adminRouter));
 
 // Start background cron task for releasing expired unpaid seat holds
 setInterval(async () => {

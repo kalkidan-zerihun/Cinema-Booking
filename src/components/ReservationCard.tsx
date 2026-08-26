@@ -22,10 +22,10 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
   const isCancelled = reservation.status === 'CANCELLED';
 
   return (
-    <div className="flex flex-col sm:flex-row items-stretch bg-[#13141f] border border-[#232535] hover:border-red-600/40 rounded-2xl overflow-hidden shadow-lg transition-all duration-200">
+    <div className="flex flex-col sm:flex-row items-stretch bg-[#0d1424] border border-[#1b263b] hover:border-amber-400/50 rounded-2xl overflow-hidden shadow-lg transition-all duration-200">
       
       {/* Poster Column */}
-      <div className="w-full sm:w-40 aspect-[2/3] sm:aspect-auto bg-[#1a1b28] relative shrink-0">
+      <div className="w-full sm:w-40 aspect-[2/3] sm:aspect-auto bg-[#101726] relative shrink-0">
         <img
           src={
             reservation.movie?.posterUrl ||
@@ -40,7 +40,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
               isConfirmed
                 ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
                 : isCancelled
-                ? 'bg-red-950 text-red-300 border border-red-800'
+                ? 'bg-rose-950 text-rose-300 border border-rose-800'
                 : 'bg-amber-950 text-amber-300 border border-amber-800'
             }`}
           >
@@ -54,7 +54,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
         <div>
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">
                 BOOKING #{reservation.bookingCode || reservation.id.slice(0, 8)}
               </span>
               <h3 className="text-lg font-black text-white leading-tight">
@@ -68,7 +68,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
                   isConfirmed
                     ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/60'
                     : isCancelled
-                    ? 'bg-red-950/60 text-red-400 border border-red-800/60'
+                    ? 'bg-rose-950/60 text-rose-400 border border-rose-800/60'
                     : 'bg-amber-950/60 text-amber-400 border border-amber-800/60'
                 }`}
               >
@@ -83,40 +83,40 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
           </div>
 
           {/* Details Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 text-xs text-gray-300">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 text-xs text-slate-300">
             <div className="flex items-center space-x-1.5">
-              <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-              <span className="truncate">{reservation.cinema?.name || 'Kali Cinema Addis'}</span>
+              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">{reservation.cinema?.name || 'Cinema Addis'}</span>
             </div>
 
             <div className="flex items-center space-x-1.5">
-              <Film className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <Film className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="truncate">{reservation.hall?.name || 'Hall 1'}</span>
             </div>
 
             <div className="flex items-center space-x-1.5">
-              <Calendar className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>{reservation.showtime?.date}</span>
             </div>
 
             <div className="flex items-center space-x-1.5">
-              <Clock className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>{reservation.showtime?.startTime}</span>
             </div>
 
             <div className="flex items-center space-x-1.5 col-span-2">
-              <Armchair className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <Armchair className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="font-bold text-white">Seats: {reservation.seatLabels.join(', ')}</span>
             </div>
           </div>
         </div>
 
         {/* Action Row */}
-        <div className="pt-3 border-t border-[#1e202e] flex items-center justify-between">
+        <div className="pt-3 border-t border-[#1a253a] flex items-center justify-between">
           <div className="text-left">
-            <span className="text-[10px] text-gray-400 block uppercase font-bold">Total Paid</span>
-            <span className="text-base font-black text-emerald-400">
-              {reservation.totalPrice} <span className="text-xs text-gray-300">ETB</span>
+            <span className="text-[10px] text-slate-400 block uppercase font-bold">Total Paid</span>
+            <span className="text-base font-black text-amber-300">
+              {reservation.totalPrice} <span className="text-xs text-slate-400">ETB</span>
             </span>
           </div>
 
@@ -125,7 +125,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
               <button
                 type="button"
                 onClick={() => onCancel(reservation.id)}
-                className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-red-400 hover:bg-red-950/20 transition-colors"
+                className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 transition-colors"
               >
                 Cancel
               </button>
@@ -134,7 +134,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
             <Link
               to={`/my-reservations/${reservation.id}`}
               id={`view-pass-btn-${reservation.id}`}
-              className="flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-md shadow-red-950/30"
+              className="flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-colors shadow-md shadow-amber-950/30"
             >
               <QrCode className="w-4 h-4" />
               <span>View E-Pass</span>

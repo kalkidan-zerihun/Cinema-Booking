@@ -140,17 +140,17 @@ export const AdminCinemas: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202232]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
         <div className="space-y-1">
           <Link
             to="/admin"
-            className="inline-flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors mb-1"
+            className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </Link>
           <h1 className="text-3xl font-black text-white">Manage Cinemas & Venues</h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400">
             Configure multiplex branches, VIP locations, addresses, and concession amenities.
           </p>
         </div>
@@ -158,7 +158,7 @@ export const AdminCinemas: React.FC = () => {
         <button
           onClick={openCreateModal}
           id="admin-add-cinema-btn"
-          className="flex items-center space-x-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60"
+          className="flex items-center space-x-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-950/40"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Cinema</span>
@@ -185,24 +185,24 @@ export const AdminCinemas: React.FC = () => {
         {cinemas.map((c) => (
           <div
             key={c.id}
-            className="p-6 rounded-2xl bg-[#12131d] border border-[#232535] space-y-4 shadow-xl flex flex-col justify-between"
+            className="p-6 rounded-2xl bg-[#0d1424] border border-[#1b263b] space-y-4 shadow-xl flex flex-col justify-between"
           >
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <span className="text-xs font-bold text-red-400 block mb-0.5">{c.location}</span>
+                  <span className="text-xs font-bold text-amber-400 block mb-0.5">{c.location}</span>
                   <h3 className="text-xl font-bold text-white">{c.name}</h3>
                 </div>
                 <div className="flex items-center space-x-1.5">
                   <button
                     onClick={() => openEditModal(c)}
-                    className="p-2 rounded-lg bg-[#1a1c2a] text-blue-400 hover:text-blue-300 transition-colors"
+                    className="p-2 rounded-lg bg-[#121c32] text-amber-400 hover:text-amber-300 transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(c.id, c.name)}
-                    className="p-2 rounded-lg bg-[#1a1c2a] text-red-400 hover:text-red-300 transition-colors"
+                    className="p-2 rounded-lg bg-[#121c32] text-red-400 hover:text-red-300 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -210,7 +210,7 @@ export const AdminCinemas: React.FC = () => {
               </div>
 
               {c.imageUrl && (
-                <div className="h-40 rounded-xl overflow-hidden bg-[#181926]">
+                <div className="h-40 rounded-xl overflow-hidden bg-[#0a0f1d]">
                   <img
                     src={c.imageUrl}
                     alt={c.name}
@@ -219,28 +219,28 @@ export const AdminCinemas: React.FC = () => {
                 </div>
               )}
 
-              <p className="text-xs text-gray-300 leading-relaxed">{c.description}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{c.description}</p>
 
-              <div className="space-y-1 text-xs text-gray-400 pt-2 border-t border-[#1e202e]">
+              <div className="space-y-1 text-xs text-slate-400 pt-2 border-t border-[#162035]">
                 {c.address && (
                   <div className="flex items-center space-x-2">
-                    <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>{c.address}</span>
                   </div>
                 )}
                 {c.phone && (
                   <div className="flex items-center space-x-2">
-                    <Phone className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                    <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>{c.phone}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-[#1e202e] text-xs">
+            <div className="flex items-center justify-between pt-2 border-t border-[#162035] text-xs">
               <Link
                 to={`/admin/halls?cinemaId=${c.id}`}
-                className="text-red-400 hover:text-red-300 font-bold"
+                className="text-amber-400 hover:text-amber-300 font-bold"
               >
                 Manage Halls in this Cinema →
               </Link>
@@ -252,14 +252,14 @@ export const AdminCinemas: React.FC = () => {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#141522] border border-[#26283d] rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#222435]">
+          <div className="bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-[#162035]">
               <h2 className="text-xl font-black text-white">
                 {editingCinema ? 'Edit Cinema' : 'Add New Cinema Branch'}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-gray-400 hover:text-white p-1"
+                className="text-slate-400 hover:text-white p-1"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -267,96 +267,96 @@ export const AdminCinemas: React.FC = () => {
 
             <form onSubmit={handleSave} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Cinema Name *</label>
+                <label className="text-xs font-bold text-slate-300">Cinema Name *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Kali Cinema - Bole Central"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  placeholder="e.g. Cinema - Bole Central"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">City / District Location *</label>
+                <label className="text-xs font-bold text-slate-300">City / District Location *</label>
                 <input
                   type="text"
                   required
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. Addis Ababa, Bole"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Description</label>
+                <label className="text-xs font-bold text-slate-300">Description</label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Overview of this cinema complex..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Physical Address</label>
+                <label className="text-xs font-bold text-slate-300">Physical Address</label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Street / Mall name"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Contact Phone</label>
+                <label className="text-xs font-bold text-slate-300">Contact Phone</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+251 11 661 2233"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Photo URL</label>
+                <label className="text-xs font-bold text-slate-300">Photo URL</label>
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-300">Amenities (comma-separated)</label>
+                <label className="text-xs font-bold text-slate-300">Amenities (comma-separated)</label>
                 <input
                   type="text"
                   value={amenitiesInput}
                   onChange={(e) => setAmenitiesInput(e.target.value)}
                   placeholder="4K Laser, Dolby Atmos, VIP Lounge, Parking"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1a1c2a] border border-[#2b2d42] text-white text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121c32] border border-[#1b263b] text-white text-xs focus:outline-none focus:border-amber-400"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[#222435]">
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[#162035]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#1a1c2a] text-gray-400 hover:text-white"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#121c32] text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase bg-[#e50914] text-white hover:bg-red-600 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase bg-amber-400 text-slate-950 hover:bg-amber-300 disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : 'Save Cinema'}
                 </button>
