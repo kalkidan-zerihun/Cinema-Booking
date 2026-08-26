@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   ShieldCheck,
   Sparkles,
+  Lock,
 } from 'lucide-react';
 import { Seat, EnrichedShowtime } from '../types';
 import { getEnrichedShowtime } from '../services/showtimes';
@@ -140,16 +141,19 @@ export const SeatSelection: React.FC = () => {
       const reservation = await createReservationAtomic({
         showtimeId,
         seatIds: Array.from(selectedSeatIds),
-        customerName: userProfile?.name || currentUser?.displayName || 'Cinema Guest',
-        customerEmail: userProfile?.email || currentUser?.email || '',
+        userId: currentUser?.uid,
+        customerName: userProfile?.fullName || currentUser?.displayName || 'Customer',
+        customerEmail: currentUser?.email || 'customer@cinema.com',
+        customerPhone: userProfile?.phone || '',
       });
 
-      // Successful atomic lock -> proceed to payment page
+      // Navigate to payment page with newly created locked reservation
       navigate(`/booking/${reservation.id}`);
     } catch (err: any) {
-      console.error('Reservation creation error:', err);
+      console.error('Reservation failed:', err);
       setErrorMessage(
-        err.message || 'One or more selected seats are no longer available. Please select available seats.'
+        err.message ||
+          'Failed to lock seats. One or more seats may have been reserved by another customer. Please select available seats and retry.'
       );
     } finally {
       setSubmitting(false);
@@ -158,31 +162,29 @@ export const SeatSelection: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
-        <p className="text-sm font-semibold text-slate-400">
-          Connecting to real-time seat inventory for this showtime...
-        </p>
+        <p className="text-sm font-semibold text-slate-400">Loading auditorium seat layout...</p>
       </div>
     );
   }
 
   if (!showtime) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
-        <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
-        <h2 className="text-2xl font-bold text-white">Showtime Not Available</h2>
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0c101a] border border-white/[0.08] rounded-3xl text-center space-y-4">
+        <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
+        <h2 className="text-xl font-bold text-white">Showtime Unavailable</h2>
         <p className="text-xs text-slate-400">
-          {errorMessage || 'This showtime could not be loaded.'}
+          {errorMessage || 'The requested screening is no longer available.'}
         </p>
         <Link
           to="/movies"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
+          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Browse Other Showtimes</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Browse Other Movies</span>
         </Link>
       </div>
     );
@@ -190,65 +192,51 @@ export const SeatSelection: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      
-      {/* Top Breadcrumb & Showtime Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
+      {/* Top Breadcrumb & Movie Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06]">
         <div className="space-y-1">
           <Link
-            to={showtime.movieId ? `/movies/${showtime.movieId}` : '/movies'}
+            to={`/movies/${showtime.movieId}`}
             className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-amber-400 transition-colors mb-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Movie Details</span>
+            <span>Back to {showtime.movie?.title || 'Movie'}</span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">
-            {showtime.movie?.title || 'Movie'} — Seat Selection
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            Select Your Seats
           </h1>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
-            <span className="flex items-center space-x-1">
-              <MapPin className="w-3.5 h-3.5 text-amber-400" />
-              <span>{showtime.cinema?.name}</span>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+            <span className="text-white font-semibold">{showtime.movie?.title}</span>
+            <span>•</span>
+            <span className="flex items-center space-x-1 text-amber-400">
+              <Clock className="w-3.5 h-3.5" />
+              <span>
+                {showtime.date} at {showtime.startTime}
+              </span>
             </span>
             <span>•</span>
-            <span className="flex items-center space-x-1">
-              <Film className="w-3.5 h-3.5 text-amber-400" />
-              <span>{showtime.hall?.name}</span>
-            </span>
-            <span>•</span>
-            <span className="flex items-center space-x-1">
-              <Calendar className="w-3.5 h-3.5 text-amber-400" />
-              <span>{showtime.date}</span>
-            </span>
-            <span>•</span>
-            <span className="flex items-center space-x-1">
-              <Clock className="w-3.5 h-3.5 text-amber-400" />
-              <span>{showtime.startTime}</span>
-            </span>
+            <span>{showtime.hall?.name}</span>
           </div>
         </div>
 
-        {/* Live Protection Status */}
-        <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#0d1424] border border-[#1b263b] text-xs text-slate-300">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Atomic Concurrency Lock Enabled</span>
+        {/* 15-Min Lock Guarantee Info */}
+        <div className="flex items-center space-x-2.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-xs text-slate-300">
+          <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>15-Minute Seat Lock on Selection</span>
         </div>
       </div>
 
-      {/* Error / Conflict Alert */}
+      {/* Error Message Toast */}
       {errorMessage && (
-        <div className="flex items-start space-x-3 p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-200 text-xs sm:text-sm">
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-bold block">Seat Availability Notice</span>
-            <p>{errorMessage}</p>
-          </div>
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Main Seat Map & Summary Split */}
+      {/* Main Seating Layout & Sidebar Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
-        {/* Left 2 Columns: Interactive Seat Map */}
+        {/* Left 2 Cols: Interactive Seat Map */}
         <div className="lg:col-span-2 space-y-6">
           <SeatMap
             seats={hallSeats}
@@ -259,8 +247,8 @@ export const SeatSelection: React.FC = () => {
           />
         </div>
 
-        {/* Right 1 Column: Summary & Checkout CTA */}
-        <div className="space-y-6 lg:sticky lg:top-28">
+        {/* Right Col: Booking Summary & Checkout Trigger */}
+        <div className="space-y-6 lg:sticky lg:top-24">
           <BookingSummary
             showtime={showtime}
             selectedSeats={selectedSeats}
@@ -268,27 +256,31 @@ export const SeatSelection: React.FC = () => {
           />
 
           <button
-            type="button"
-            id="proceed-to-payment-btn"
-            disabled={submitting || selectedSeats.length === 0}
             onClick={handleProceedToPayment}
-            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-all duration-200 shadow-xl shadow-amber-950/70 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+            id="proceed-to-payment-btn"
+            disabled={selectedSeatIds.size === 0 || submitting}
+            className={`w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 shadow-xl ${
+              selectedSeatIds.size > 0 && !submitting
+                ? 'bg-amber-400 text-slate-950 hover:bg-amber-300 shadow-amber-400/25 cursor-pointer'
+                : 'bg-white/[0.04] text-slate-400 border border-white/[0.06] cursor-not-allowed'
+            }`}
           >
             {submitting ? (
-              <span>Securing Seat Locks...</span>
+              <>
+                <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                <span>Securing Your Seats...</span>
+              </>
             ) : (
               <>
-                <Ticket className="w-5 h-5" />
+                <Ticket className="w-4 h-4" />
                 <span>
-                  Reserve & Proceed ({totalPrice} ETB)
+                  {selectedSeatIds.size > 0
+                    ? `Proceed to Payment (${totalPrice} ETB)`
+                    : 'Select Seats on Map'}
                 </span>
               </>
             )}
           </button>
-
-          <p className="text-[11px] text-center text-slate-400">
-            Selected seats will be reserved under your account upon proceeding.
-          </p>
         </div>
       </div>
     </div>

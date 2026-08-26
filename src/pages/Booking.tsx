@@ -12,7 +12,9 @@ import {
   AlertCircle,
   CheckCircle2,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
+  Lock,
 } from 'lucide-react';
 import { EnrichedReservation, PaymentMethod } from '../types';
 import { getEnrichedReservation } from '../services/reservations';
@@ -27,7 +29,7 @@ export const Booking: React.FC = () => {
   const [reservation, setReservation] = useState<EnrichedReservation | null>(null);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('TELEBIRR');
-  
+
   // Payment Form States
   const [phone, setPhone] = useState('0911234567');
   const [cardNumber, setCardNumber] = useState('');
@@ -85,12 +87,6 @@ export const Booking: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      // initializePayment is a Cloud Function call. It never trusts an
-      // amount from this form — the server reads the reservation's own
-      // stored price. It also never returns "SUCCESS" itself; real
-      // gateway methods (CHAPA/TELEBIRR/CARD) redirect to Chapa's hosted
-      // checkout, and only the server-side webhook/verification can
-      // confirm the reservation afterward.
       const result = await initializePayment({ reservationId, method: paymentMethod });
 
       if (result.alreadyConfirmed) {
@@ -102,10 +98,6 @@ export const Booking: React.FC = () => {
       }
 
       if (paymentMethod === 'PAY_AT_CINEMA') {
-        // No money has moved yet — the reservation is secured (seats are
-        // locked) but stays PENDING until staff confirm payment at the
-        // counter. The ticket UI below already renders a "PAYMENT
-        // PENDING" state for this, so we never claim CONFIRMED here.
         const updated = await getEnrichedReservation(reservationId);
         if (updated) setReservation(updated);
         setPaymentSuccess(true);
@@ -114,9 +106,6 @@ export const Booking: React.FC = () => {
       }
 
       if (result.checkoutUrl) {
-        // Hand off to Chapa's hosted checkout. The customer completes
-        // payment there; Chapa's webhook (and our own re-verification on
-        // return) is what confirms the reservation — never this redirect.
         window.location.href = result.checkoutUrl;
         return;
       }
@@ -132,8 +121,8 @@ export const Booking: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
         <p className="text-sm font-semibold text-slate-400">Loading your reservation details...</p>
@@ -141,175 +130,167 @@ export const Booking: React.FC = () => {
     );
   }
 
-  if (!reservation) {
+  if (paymentSuccess && reservation) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
-        <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
-        <h2 className="text-2xl font-bold text-white">Reservation Not Found</h2>
-        <p className="text-xs text-slate-400">
-          {errorMessage || 'The requested booking ID does not exist.'}
-        </p>
-        <Link
-          to="/movies"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
-        >
-          <span>Return to Movies</span>
-        </Link>
-      </div>
-    );
-  }
-
-  // If already confirmed or just paid successfully -> show Digital Ticket!
-  if (paymentSuccess || reservation.status === 'CONFIRMED') {
-    return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-300">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold">
             <CheckCircle2 className="w-4 h-4" />
             <span>Reservation Confirmed & Secured</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white">Your Movie E-Pass is Ready!</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-white">Here is Your Admission Pass</h1>
           <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
-            Present your QR pass at the entrance. A digital copy has also been registered under your bookings.
+            Please present this digital pass or booking reference number at the theater entrance.
           </p>
         </div>
 
         <DigitalTicket reservation={reservation} />
 
-        <div className="text-center pt-4">
+        <div className="flex justify-center pt-4">
           <Link
             to="/my-reservations"
-            className="inline-flex items-center space-x-2 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
+            className="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/10 transition-colors"
           >
             <span>View All My Bookings</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* Header */}
-      <div className="space-y-1 pb-4 border-b border-[#162035]">
-        <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-          SECURE CHECKOUT & PAYMENT
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-white">
-          Complete Your Reservation
-        </h1>
+  if (!reservation) {
+    return (
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0c101a] border border-white/[0.08] rounded-3xl text-center space-y-4">
+        <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
+        <h2 className="text-xl font-bold text-white">Reservation Not Found</h2>
         <p className="text-xs text-slate-400">
-          Booking Reference #{reservation.bookingCode || reservation.id.slice(0, 8)}
+          {errorMessage || 'This reservation could not be loaded or has expired.'}
+        </p>
+        <Link
+          to="/movies"
+          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Return to Catalog</span>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Header */}
+      <div className="space-y-1 pb-4 border-b border-white/[0.06]">
+        <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400">
+          <CreditCard className="w-4 h-4" />
+          <span>Checkout & Secure Payment</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-black text-white">Complete Your Booking</h1>
+        <p className="text-xs sm:text-sm text-slate-400">
+          Confirm your payment method to finalize seat reservation #{reservation.bookingCode || reservation.id.slice(0, 8)}.
         </p>
       </div>
 
-      {/* Error Notice */}
       {errorMessage && (
-        <div className="flex items-start space-x-2.5 p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-200 text-xs">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Grid: Payment Method Form (Left 2 cols) & Order Review (Right 1 col) */}
-      <form onSubmit={handlePay} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
-        {/* Left 2 Cols: Payment Methods & Inputs */}
-        <div className="lg:col-span-2 bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-          <PaymentMethods
-            selectedMethod={paymentMethod}
-            onChangeMethod={setPaymentMethod}
-            phone={phone}
-            onChangePhone={setPhone}
-            cardNumber={cardNumber}
-            onChangeCardNumber={setCardNumber}
-            cardExpiry={cardExpiry}
-            onChangeCardExpiry={setCardExpiry}
-            cardCvc={cardCvc}
-            onChangeCardCvc={setCardCvc}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+        {/* Left 3 cols: Payment form */}
+        <div className="md:col-span-3 space-y-6">
+          <form onSubmit={handlePay} className="space-y-6">
+            <PaymentMethods
+              selectedMethod={paymentMethod}
+              onChangeMethod={setPaymentMethod}
+              phone={phone}
+              onChangePhone={setPhone}
+              cardNumber={cardNumber}
+              onChangeCardNumber={setCardNumber}
+              cardExpiry={cardExpiry}
+              onChangeCardExpiry={setCardExpiry}
+              cardCvc={cardCvc}
+              onChangeCardCvc={setCardCvc}
+            />
 
-          <button
-            type="submit"
-            id="pay-now-btn"
-            disabled={processing}
-            className="w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-all duration-200 shadow-xl shadow-amber-950/70 disabled:opacity-50"
-          >
-            {processing ? (
-              <span className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
-                <span>Processing Payment...</span>
-              </span>
-            ) : (
-              <>
-                <ShieldCheck className="w-5 h-5" />
-                <span>
-                  Confirm & Pay {reservation.totalPrice} ETB
+            <button
+              type="submit"
+              id="confirm-pay-btn"
+              disabled={processing}
+              className="w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider bg-amber-400 text-slate-950 hover:bg-amber-300 transition-all duration-200 shadow-xl shadow-amber-400/20"
+            >
+              {processing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Processing Transaction...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>
+                    Pay {reservation.totalPrice} ETB & Confirm Seats
+                  </span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Right 2 cols: Reservation Ticket Summary */}
+        <div className="md:col-span-2 space-y-4">
+          <div className="p-5 rounded-2xl bg-[#0c101a] border border-white/[0.08] space-y-4 shadow-xl">
+            <h3 className="text-sm font-bold text-white pb-3 border-b border-white/[0.06]">
+              Order Breakdown
+            </h3>
+
+            <div className="flex space-x-3">
+              {reservation.movie?.posterUrl && (
+                <img
+                  src={reservation.movie.posterUrl}
+                  alt={reservation.movie.title}
+                  className="w-14 h-20 object-cover rounded-xl border border-white/10 shrink-0"
+                />
+              )}
+              <div className="space-y-1 overflow-hidden">
+                <h4 className="text-xs sm:text-sm font-bold text-white truncate">
+                  {reservation.movie?.title}
+                </h4>
+                <p className="text-xs text-amber-400 font-medium">
+                  {reservation.showtime?.format || '2D'} • {reservation.showtime?.date}
+                </p>
+                <p className="text-[11px] text-slate-400">{reservation.cinema?.name}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-2 text-xs border-t border-white/[0.06]">
+              <div className="flex justify-between text-slate-300">
+                <span className="text-slate-400">Hall:</span>
+                <span>{reservation.hall?.name}</span>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span className="text-slate-400">Time:</span>
+                <span>{reservation.showtime?.startTime}</span>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span className="text-slate-400">Reserved Seats:</span>
+                <span className="font-bold text-amber-400">
+                  {reservation.seatLabels.join(', ')}
                 </span>
-              </>
-            )}
-          </button>
-        </div>
+              </div>
+            </div>
 
-        {/* Right 1 Col: Summary Review */}
-        <div className="bg-[#0d1424] border border-[#1b263b] rounded-3xl p-6 space-y-6 shadow-xl lg:sticky lg:top-28">
-          <div className="flex items-center space-x-2 pb-4 border-b border-[#162035]">
-            <Ticket className="w-5 h-5 text-amber-400" />
-            <h3 className="text-base font-bold text-white">Order Summary</h3>
-          </div>
-
-          <div className="flex space-x-4">
-            {reservation.movie?.posterUrl && (
-              <img
-                src={reservation.movie.posterUrl}
-                alt={reservation.movie.title}
-                className="w-16 h-24 object-cover rounded-lg border border-[#1e2d4d] shrink-0"
-              />
-            )}
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-white leading-tight">
-                {reservation.movie?.title}
-              </h4>
-              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#121c32] text-amber-400 border border-amber-500/30">
-                {reservation.showtime?.format || '2D'}
+            <div className="pt-3 border-t border-white/[0.08] flex justify-between items-baseline">
+              <span className="text-xs font-bold text-slate-200">Total Price:</span>
+              <span className="text-base font-black text-amber-400">
+                {reservation.totalPrice} ETB
               </span>
-              <p className="text-xs text-slate-400">{reservation.movie?.duration} mins</p>
             </div>
-          </div>
-
-          <div className="space-y-3 pt-2 text-xs border-t border-[#162035]">
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Cinema:</span>
-              <span className="font-semibold text-white">{reservation.cinema?.name}</span>
-            </div>
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Hall:</span>
-              <span className="font-semibold text-white">{reservation.hall?.name}</span>
-            </div>
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Date:</span>
-              <span className="font-semibold text-white">{reservation.showtime?.date}</span>
-            </div>
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Showtime:</span>
-              <span className="font-semibold text-white">{reservation.showtime?.startTime}</span>
-            </div>
-            <div className="flex items-center justify-between text-slate-300 pt-2 border-t border-[#162035]">
-              <span className="text-slate-400">Selected Seats:</span>
-              <span className="font-bold text-amber-400">{reservation.seatLabels.join(', ')}</span>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-[#162035] flex items-baseline justify-between">
-            <span className="text-sm font-bold text-slate-300">Amount Due:</span>
-            <span className="text-2xl font-black text-emerald-400">
-              {reservation.totalPrice} <span className="text-xs text-slate-300">ETB</span>
-            </span>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -34,15 +35,28 @@ import { AdminReservations } from './pages/admin/AdminReservations';
 import { AdminUsers } from './pages/admin/AdminUsers';
 
 export default function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <AuthProvider>
       <Router>
         <ScrollToTop />
-        <div className="min-h-screen flex flex-col bg-[#0c0d12] text-gray-100 selection:bg-red-600 selection:text-white font-sans antialiased">
-          <Navbar />
+        <div className="min-h-screen flex bg-[#07090e] text-slate-100 selection:bg-amber-400 selection:text-slate-950 font-sans antialiased">
+          {/* Left Sidebar Navigation */}
+          <Sidebar
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
 
-          <main className="flex-1">
-            <Routes>
+          {/* Main Content Column */}
+          <div className="flex-1 flex flex-col min-w-0 lg:pl-64 transition-all duration-300">
+            <Header
+              onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+              isSidebarOpen={sidebarOpen}
+            />
+
+            <main className="flex-1">
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/movies" element={<Movies />} />
@@ -167,7 +181,8 @@ export default function App() {
 
           <Footer />
         </div>
-      </Router>
-    </AuthProvider>
-  );
+      </div>
+    </Router>
+  </AuthProvider>
+);
 }

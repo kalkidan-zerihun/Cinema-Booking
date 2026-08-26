@@ -50,8 +50,8 @@ export const ReservationDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
         <p className="text-sm font-semibold text-slate-400">Loading your digital admission pass...</p>
@@ -61,17 +61,17 @@ export const ReservationDetails: React.FC = () => {
 
   if (!reservation) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0c101a] border border-white/[0.08] rounded-3xl text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
-        <h2 className="text-2xl font-bold text-white">Ticket Not Found</h2>
+        <h2 className="text-xl font-bold text-white">Ticket Not Found</h2>
         <p className="text-xs text-slate-400">
           {errorMessage || 'The requested admission pass does not exist.'}
         </p>
         <Link
           to="/my-reservations"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
+          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Bookings</span>
         </Link>
       </div>
@@ -79,15 +79,14 @@ export const ReservationDetails: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header & Back Link */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#162035]">
+      <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
         <Link
           to="/my-reservations"
           className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to All Bookings</span>
         </Link>
         <span className="text-xs font-bold uppercase tracking-wider text-amber-400">

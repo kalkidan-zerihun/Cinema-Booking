@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   Share2,
   Users,
+  Armchair,
+  CheckCircle2,
 } from 'lucide-react';
 import { Movie, Cinema, Hall, EnrichedShowtime } from '../types';
 import { getMovieById } from '../services/movies';
@@ -84,8 +86,8 @@ export const MovieDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto animate-spin">
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto animate-spin">
           <Film className="w-6 h-6" />
         </div>
         <p className="text-sm font-semibold text-slate-400">Loading movie details & showtimes...</p>
@@ -95,45 +97,43 @@ export const MovieDetails: React.FC = () => {
 
   if (!movie) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0d1424] border border-[#1b263b] rounded-3xl text-center space-y-4">
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#0c101a] border border-white/[0.08] rounded-3xl text-center space-y-4">
         <Film className="w-12 h-12 text-slate-600 mx-auto" />
-        <h2 className="text-2xl font-bold text-white">Movie Not Found</h2>
+        <h2 className="text-xl font-bold text-white">Movie Not Found</h2>
         <p className="text-xs text-slate-400">
           The requested movie record could not be found or has been removed from the schedule.
         </p>
         <Link
           to="/movies"
-          className="inline-flex items-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950"
+          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Return to Movies</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Return to Catalog</span>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12 pb-16">
-      
+    <div className="space-y-10 pb-16">
       {/* 1. Cinematic Backdrop Header */}
-      <div className="relative min-h-[460px] lg:min-h-[520px] flex items-end bg-[#070a12] overflow-hidden border-b border-[#162035]">
-        
+      <div className="relative min-h-[440px] lg:min-h-[500px] flex items-end bg-[#07090e] overflow-hidden border-b border-white/[0.08]">
         {/* Backdrop image */}
         <div className="absolute inset-0 z-0">
           <img
             src={movie.backdropUrl || movie.posterUrl}
             alt={movie.title}
-            className="w-full h-full object-cover object-top opacity-30 filter blur-[1px]"
+            className="w-full h-full object-cover object-top opacity-35 filter brightness-75"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#070a12] via-[#070a12]/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#070a12] via-[#070a12]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#07090e] via-[#07090e]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#07090e] via-[#07090e]/70 to-transparent" />
         </div>
 
         {/* Back button */}
         <div className="absolute top-6 left-4 sm:left-8 z-20">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-950/60 backdrop-blur-md text-slate-300 hover:text-white border border-[#1b263b] text-xs font-semibold transition-colors"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md text-slate-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back</span>
@@ -141,50 +141,51 @@ export const MovieDetails: React.FC = () => {
         </div>
 
         {/* Main Content Layout */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
-            
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-6 sm:gap-8">
             {/* Large Poster */}
-            <div className="w-48 sm:w-60 md:w-72 aspect-[2/3] shrink-0 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#1b263b] bg-[#0d1424] relative group">
+            <div className="w-44 sm:w-56 md:w-64 aspect-[2/3] shrink-0 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-slate-900 relative group">
               <img
                 src={movie.posterUrl}
                 alt={movie.title}
                 className="w-full h-full object-cover"
               />
-              <button
-                onClick={() => setTrailerOpen(true)}
-                className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 scale-75 group-hover:scale-100 shadow-xl shadow-amber-950 font-bold"
-              >
-                <Play className="w-6 h-6 fill-current ml-0.5" />
-              </button>
+              {movie.trailerUrl && (
+                <button
+                  onClick={() => setTrailerOpen(true)}
+                  className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 scale-75 group-hover:scale-100 shadow-xl shadow-black/80 font-bold"
+                >
+                  <Play className="w-5 h-5 fill-current ml-0.5" />
+                </button>
+              )}
             </div>
 
             {/* Movie Info */}
-            <div className="flex-1 space-y-4 text-center md:text-left">
+            <div className="flex-1 space-y-3.5 text-center md:text-left">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                <span className="px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {movie.genre}
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-950">
+                  {movie.genre || 'Feature Film'}
                 </span>
 
                 {movie.ageRating && (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#121c32] text-slate-300 border border-[#1e2d4d]">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-slate-200 border border-white/10">
                     {movie.ageRating}
                   </span>
                 )}
 
                 {movie.rating && (
-                  <div className="flex items-center space-x-1 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  <div className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-black/60 text-amber-400 border border-amber-400/30">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     <span>{movie.rating.toFixed(1)} / 10</span>
                   </div>
                 )}
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
                 {movie.title}
               </h1>
 
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs sm:text-sm text-slate-300">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs sm:text-sm text-slate-300">
                 <span className="flex items-center space-x-1.5">
                   <Clock className="w-4 h-4 text-amber-400" />
                   <span>{formatDuration(movie.duration)}</span>
@@ -192,7 +193,7 @@ export const MovieDetails: React.FC = () => {
                 <span>•</span>
                 <span className="flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-slate-400" />
-                  <span>Release: {movie.releaseDate}</span>
+                  <span>Release: {movie.releaseDate || '2026'}</span>
                 </span>
                 {movie.language && (
                   <>
@@ -203,21 +204,23 @@ export const MovieDetails: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
-                <button
-                  onClick={() => setTrailerOpen(true)}
-                  id="movie-watch-trailer-btn"
-                  className="flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-colors shadow-lg shadow-amber-950/60"
-                >
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>WATCH TRAILER</span>
-                </button>
+                {movie.trailerUrl && (
+                  <button
+                    onClick={() => setTrailerOpen(true)}
+                    id="movie-watch-trailer-btn"
+                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/15 text-white backdrop-blur-md border border-white/15 transition-colors"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>Watch Trailer</span>
+                  </button>
+                )}
 
                 <a
                   href="#showtimes-section"
-                  className="flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-xs bg-[#0d1424] text-slate-200 hover:bg-[#121c32] hover:text-white border border-[#1b263b] transition-colors"
+                  className="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-md shadow-amber-400/20"
                 >
-                  <Ticket className="w-4 h-4 text-amber-400" />
-                  <span>VIEW SHOWTIMES</span>
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span>Book Showtime</span>
                 </a>
               </div>
             </div>
@@ -225,33 +228,32 @@ export const MovieDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Main Body Grid: Synopsis & Details on Left, Showtimes on Right */}
+      {/* 2. Main Body Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Synopsis, Cast, Metadata */}
           <div className="space-y-6">
-            <div className="bg-[#0d1424] border border-[#1b263b] rounded-2xl p-6 space-y-4">
-              <h3 className="text-base font-bold text-white tracking-wide">Storyline & Synopsis</h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
+            <div className="bg-[#0c101a] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+              <h3 className="text-base font-bold text-white tracking-wide">Storyline</h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 {movie.description}
               </p>
 
               {movie.director && (
-                <div className="pt-3 border-t border-[#162035] text-xs">
-                  <span className="text-slate-400 block mb-0.5">Director:</span>
-                  <span className="font-bold text-slate-200">{movie.director}</span>
+                <div className="pt-3 border-t border-white/[0.06] text-xs">
+                  <span className="text-slate-400 block mb-0.5">Director</span>
+                  <span className="font-semibold text-white">{movie.director}</span>
                 </div>
               )}
 
               {movie.cast && movie.cast.length > 0 && (
-                <div className="pt-3 border-t border-[#162035] text-xs">
-                  <span className="text-slate-400 block mb-1">Key Cast:</span>
+                <div className="pt-3 border-t border-white/[0.06] text-xs">
+                  <span className="text-slate-400 block mb-1.5">Key Cast</span>
                   <div className="flex flex-wrap gap-1.5">
                     {movie.cast.map((actor, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 rounded bg-[#101726] text-slate-300 border border-[#1e2d4d]"
+                        className="px-2.5 py-1 rounded-lg bg-white/[0.03] text-slate-300 border border-white/[0.06] text-xs"
                       >
                         {actor}
                       </span>
@@ -261,91 +263,96 @@ export const MovieDetails: React.FC = () => {
               )}
             </div>
 
-            {/* Cinema Tech Quality Badge */}
-            <div className="bg-gradient-to-br from-[#0f172a] to-[#0a0f1d] border border-amber-500/30 rounded-2xl p-6 space-y-3">
-              <div className="flex items-center space-x-2 text-amber-400">
-                <Sparkles className="w-5 h-5" />
-                <h4 className="text-sm font-bold">Cinema Standards</h4>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Presented in uncompressed 4K Laser Projection with Dolby Atmos multi-dimensional spatial audio for total audience immersion.
-              </p>
+            {/* Experience Perks Card */}
+            <div className="bg-[#0c101a] border border-white/[0.08] rounded-2xl p-6 space-y-3">
+              <h4 className="text-sm font-bold text-white">Cinema Amenities</h4>
+              <ul className="space-y-2 text-xs text-slate-300">
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Real-time reserved seating hold</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Laser 4K HDR Projection & Dolby Atmos</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Mobile QR Code instant admission pass</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          {/* Right Column: Available Showtimes (2 Columns Wide on LG) */}
-          <div id="showtimes-section" className="lg:col-span-2 space-y-6 scroll-mt-24">
-            
-            {/* Header & Date Filter */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#1b263b]">
-              <div className="space-y-0.5">
-                <h2 className="text-xl font-black text-white flex items-center space-x-2">
-                  <Ticket className="w-5 h-5 text-amber-400" />
-                  <span>Available Showtimes</span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Select your preferred hall and time to choose your seats
-                </p>
-              </div>
+          {/* Right Column: Date Tabs & Available Showtimes List */}
+          <div className="lg:col-span-2 space-y-6" id="showtimes-section">
+            <div className="bg-[#0c101a] border border-white/[0.08] rounded-2xl p-5 sm:p-6 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-white">Available Showtimes</h2>
+                  <p className="text-xs text-slate-400">Select a date and hall to choose your seats</p>
+                </div>
 
-              {/* Date Filter Tabs */}
-              {availableDates.length > 1 && (
-                <div className="flex items-center space-x-1.5 bg-[#0d1424] p-1 rounded-xl border border-[#1b263b] overflow-x-auto">
-                  <button
-                    onClick={() => setSelectedDate('ALL')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
-                      selectedDate === 'ALL'
-                        ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950'
-                        : 'text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    All Dates
-                  </button>
-                  {availableDates.map((dateStr) => (
+                {/* Date selection pill filters */}
+                {availableDates.length > 0 && (
+                  <div className="flex items-center space-x-1.5 overflow-x-auto pb-1">
                     <button
-                      key={dateStr}
-                      onClick={() => setSelectedDate(dateStr)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                        selectedDate === dateStr
-                          ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950'
-                          : 'text-slate-400 hover:text-slate-200'
+                      onClick={() => setSelectedDate('ALL')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
+                        selectedDate === 'ALL'
+                          ? 'bg-amber-400 text-slate-950 font-bold'
+                          : 'bg-white/[0.03] text-slate-300 border border-white/[0.08] hover:bg-white/[0.06]'
                       }`}
                     >
-                      {dateStr}
+                      All Dates
                     </button>
+                    {availableDates.map((date) => (
+                      <button
+                        key={date}
+                        onClick={() => setSelectedDate(date)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
+                          selectedDate === date
+                            ? 'bg-amber-400 text-slate-950 font-bold'
+                            : 'bg-white/[0.03] text-slate-300 border border-white/[0.08] hover:bg-white/[0.06]'
+                        }`}
+                      >
+                        {date}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Showtimes List */}
+              {filteredShowtimes.length > 0 ? (
+                <div className="space-y-3">
+                  {filteredShowtimes.map((st) => (
+                    <ShowtimeCard key={st.id} showtime={st} />
                   ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center space-y-3">
+                  <Ticket className="w-10 h-10 text-slate-600 mx-auto" />
+                  <p className="text-sm font-bold text-slate-300">
+                    No showtimes scheduled for this selection
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Try selecting "All Dates" or check back later for newly added screenings.
+                  </p>
                 </div>
               )}
             </div>
-
-            {/* Showtimes List */}
-            {filteredShowtimes.length > 0 ? (
-              <div className="space-y-4">
-                {filteredShowtimes.map((st) => (
-                  <ShowtimeCard key={st.id} showtime={st} />
-                ))}
-              </div>
-            ) : (
-              <div className="p-12 text-center bg-[#0d1424] border border-[#1b263b] rounded-2xl space-y-3">
-                <Calendar className="w-10 h-10 text-slate-600 mx-auto" />
-                <p className="text-base font-bold text-slate-300">
-                  No showtimes currently scheduled for this date
-                </p>
-                <p className="text-xs text-slate-400">
-                  Please check other scheduled dates or explore our other featured releases.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      <TrailerModal
-        isOpen={trailerOpen}
-        onClose={() => setTrailerOpen(false)}
-        title={movie.title}
-        trailerUrl={movie.trailerUrl}
-      />
+      {trailerOpen && (
+        <TrailerModal
+          isOpen={trailerOpen}
+          onClose={() => setTrailerOpen(false)}
+          title={movie.title}
+          trailerUrl={movie.trailerUrl}
+        />
+      )}
     </div>
   );
 };

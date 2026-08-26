@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Smartphone, CreditCard, Store, ShieldCheck, Zap, Info } from 'lucide-react';
 import { PaymentMethod } from '../types';
 
@@ -29,9 +29,9 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between pb-2">
-        <label className="text-sm font-bold text-slate-200">Select Payment Method</label>
-        <span className="text-xs text-slate-400">All transactions encrypted</span>
+      <div className="flex items-center justify-between pb-1">
+        <label className="text-xs sm:text-sm font-bold text-white">Payment Method</label>
+        <span className="text-[11px] text-slate-400">256-bit Encrypted</span>
       </div>
 
       {/* Grid of Options */}
@@ -41,23 +41,23 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           type="button"
           id="payment-method-telebirr"
           onClick={() => onChangeMethod('TELEBIRR')}
-          className={`flex items-center space-x-3 p-4 rounded-xl border text-left transition-all ${
+          className={`flex items-center space-x-3 p-3.5 rounded-2xl border text-left transition-all ${
             selectedMethod === 'TELEBIRR'
-              ? 'bg-amber-950/30 border-amber-500/80 text-white ring-1 ring-amber-500/40 shadow-lg'
-              : 'bg-[#0d1424] border-[#1b263b] text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              ? 'bg-amber-400/10 border-amber-400 text-white shadow-md'
+              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20'
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-400/15 text-amber-400 flex items-center justify-center shrink-0">
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-bold text-white">Telebirr</span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-300">
+              <span className="text-xs sm:text-sm font-bold text-white">Telebirr</span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-400/20 text-amber-400">
                 FAST
               </span>
             </div>
-            <span className="text-xs text-slate-400 block">Mobile wallet direct charge</span>
+            <span className="text-[11px] text-slate-400 block">Mobile wallet direct charge</span>
           </div>
         </button>
 
@@ -66,23 +66,23 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           type="button"
           id="payment-method-chapa"
           onClick={() => onChangeMethod('CHAPA')}
-          className={`flex items-center space-x-3 p-4 rounded-xl border text-left transition-all ${
+          className={`flex items-center space-x-3 p-3.5 rounded-2xl border text-left transition-all ${
             selectedMethod === 'CHAPA'
-              ? 'bg-emerald-950/30 border-emerald-500/80 text-white ring-1 ring-emerald-500/40 shadow-lg'
-              : 'bg-[#0d1424] border-[#1b263b] text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              ? 'bg-amber-400/10 border-amber-400 text-white shadow-md'
+              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20'
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
             <Zap className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-bold text-white">Chapa</span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300">
-                ET GATEWAY
+              <span className="text-xs sm:text-sm font-bold text-white">Chapa</span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400">
+                GATEWAY
               </span>
             </div>
-            <span className="text-xs text-slate-400 block">Local banks & cards</span>
+            <span className="text-[11px] text-slate-400 block">Local banks & CBE Birr</span>
           </div>
         </button>
 
@@ -91,124 +91,109 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           type="button"
           id="payment-method-card"
           onClick={() => onChangeMethod('CARD')}
-          className={`flex items-center space-x-3 p-4 rounded-xl border text-left transition-all ${
+          className={`flex items-center space-x-3 p-3.5 rounded-2xl border text-left transition-all ${
             selectedMethod === 'CARD'
-              ? 'bg-sky-950/30 border-sky-500/80 text-white ring-1 ring-sky-500/40 shadow-lg'
-              : 'bg-[#0d1424] border-[#1b263b] text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              ? 'bg-amber-400/10 border-amber-400 text-white shadow-md'
+              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20'
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center shrink-0">
             <CreditCard className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-sm font-bold text-white block">Credit / Debit Card</span>
-            <span className="text-xs text-slate-400 block">Visa, Mastercard, CBE Birr</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs sm:text-sm font-bold text-white">Visa / Mastercard</span>
+            </div>
+            <span className="text-[11px] text-slate-400 block">International credit/debit card</span>
           </div>
         </button>
 
-        {/* Pay at Cinema */}
+        {/* Pay at Counter */}
         <button
           type="button"
-          id="payment-method-cinema"
+          id="payment-method-counter"
           onClick={() => onChangeMethod('PAY_AT_CINEMA')}
-          className={`flex items-center space-x-3 p-4 rounded-xl border text-left transition-all ${
+          className={`flex items-center space-x-3 p-3.5 rounded-2xl border text-left transition-all ${
             selectedMethod === 'PAY_AT_CINEMA'
-              ? 'bg-amber-950/30 border-amber-500/80 text-white ring-1 ring-amber-500/40 shadow-lg'
-              : 'bg-[#0d1424] border-[#1b263b] text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              ? 'bg-amber-400/10 border-amber-400 text-white shadow-md'
+              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20'
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
             <Store className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-sm font-bold text-white block">Pay at Cinema</span>
-            <span className="text-xs text-slate-400 block">Pay at box office counter</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs sm:text-sm font-bold text-white">Pay at Counter</span>
+            </div>
+            <span className="text-[11px] text-slate-400 block">Cash or POS at cinema desk</span>
           </div>
         </button>
       </div>
 
-      {/* Dynamic input fields based on selected payment method */}
-      <div className="p-4 rounded-xl bg-[#090e1a] border border-[#1b263b] space-y-3">
+      {/* Dynamic input form depending on selected method */}
+      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] space-y-3">
         {selectedMethod === 'TELEBIRR' && (
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300">
-              Telebirr Registered Phone Number (+251...)
-            </label>
+            <label className="text-xs font-semibold text-slate-300">Telebirr Mobile Number</label>
             <input
               type="tel"
               id="telebirr-phone-input"
               value={phone}
               onChange={(e) => onChangePhone(e.target.value)}
-              placeholder="0911234567 or +251911234567"
-              className="w-full px-3.5 py-2.5 rounded-lg bg-[#0f172a] border border-[#1e293b] text-white text-sm focus:outline-none focus:border-amber-400"
+              placeholder="0911234567"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-mono"
             />
             <p className="text-[11px] text-slate-400">
-              A USSD confirmation prompt or OTP authorization request will be linked to this number.
+              A push notification will prompt you on your device to authorize the transaction.
             </p>
           </div>
         )}
 
         {selectedMethod === 'CHAPA' && (
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-emerald-400 text-xs font-semibold">
-              <Zap className="w-4 h-4" />
-              <span>Chapa Instant Payment Gateway</span>
-            </div>
-            <p className="text-xs text-slate-300">
-              Seamlessly integrates with Ethiopian commercial banks (Awash, CBE, Dashen, Abyssinia, etc.).
+          <div className="space-y-1.5 text-xs text-slate-300">
+            <p className="font-semibold text-white">Chapa Hosted Checkout</p>
+            <p className="text-slate-400">
+              You will be redirected to Chapa's official gateway to pay securely using Commercial Bank of Ethiopia (CBE), Awash, Telebirr, or Abyssinia.
             </p>
-            <input
-              type="email"
-              id="chapa-email-input"
-              placeholder="Customer email for Chapa digital receipt"
-              className="w-full px-3.5 py-2.5 rounded-lg bg-[#0f172a] border border-[#1e293b] text-white text-sm focus:outline-none focus:border-emerald-500"
-            />
           </div>
         )}
 
         {selectedMethod === 'CARD' && (
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Card Number
-              </label>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">Card Number</label>
               <input
                 type="text"
                 id="card-number-input"
-                maxLength={19}
                 value={cardNumber}
                 onChange={(e) => onChangeCardNumber(e.target.value)}
-                placeholder="4111 2222 3333 4444"
-                className="w-full px-3.5 py-2.5 rounded-lg bg-[#0f172a] border border-[#1e293b] text-white text-sm focus:outline-none focus:border-amber-400"
+                placeholder="4111 •••• •••• ••••"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-mono"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Expiry (MM/YY)
-                </label>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">Expiry Date</label>
                 <input
                   type="text"
                   id="card-expiry-input"
-                  maxLength={5}
                   value={cardExpiry}
                   onChange={(e) => onChangeCardExpiry(e.target.value)}
-                  placeholder="08/28"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#0f172a] border border-[#1e293b] text-white text-sm focus:outline-none focus:border-amber-400"
+                  placeholder="MM/YY"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-mono"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  CVV / CVC
-                </label>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">CVC / CVV</label>
                 <input
                   type="password"
                   id="card-cvc-input"
-                  maxLength={4}
                   value={cardCvc}
                   onChange={(e) => onChangeCardCvc(e.target.value)}
-                  placeholder="123"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#0f172a] border border-[#1e293b] text-white text-sm focus:outline-none focus:border-amber-400"
+                  placeholder="•••"
+                  maxLength={4}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-mono"
                 />
               </div>
             </div>
@@ -216,18 +201,13 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         )}
 
         {selectedMethod === 'PAY_AT_CINEMA' && (
-          <div className="flex items-start space-x-2 text-xs text-amber-300/90 bg-amber-950/20 border border-amber-500/30 p-3 rounded-lg">
-            <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold">Reservation Policy:</span> Your seats will be held under your booking code. Please present your digital ticket and complete payment at the counter at least 20 minutes prior to showtime.
-            </div>
+          <div className="space-y-1.5 text-xs text-slate-300">
+            <p className="font-semibold text-white">Box Office Hold Notice</p>
+            <p className="text-slate-400">
+              Your seats are held. Please present your booking reference code at the cinema ticketing counter at least 30 minutes before showtime.
+            </p>
           </div>
         )}
-      </div>
-
-      <div className="flex items-center space-x-2 text-xs text-slate-400 pt-1">
-        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-        <span>Official PCI-DSS compliant cinema transaction system.</span>
       </div>
     </div>
   );

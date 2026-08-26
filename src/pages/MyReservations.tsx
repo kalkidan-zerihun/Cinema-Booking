@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Ticket, Film, AlertCircle, Sparkles, Filter } from 'lucide-react';
+import { Ticket, Film, AlertCircle, Sparkles, Filter, ArrowRight } from 'lucide-react';
 import { EnrichedReservation, ReservationStatus } from '../types';
 import { getUserReservations, cancelReservation } from '../services/reservations';
 import { getShowtimes } from '../services/showtimes';
@@ -89,30 +89,29 @@ export const MyReservations: React.FC = () => {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#162035]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
         <div className="space-y-1">
-          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400">
             <Ticket className="w-4 h-4" />
-            <span>MEMBER ADMISSION PORTAL</span>
+            <span>Member Admission Portal</span>
           </div>
-          <h1 className="text-3xl font-black text-white">My Movie Bookings</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl sm:text-3xl font-black text-white">My Movie Bookings</h1>
+          <p className="text-xs sm:text-sm text-slate-400">
             Access your active digital tickets, admission passes, and reservation history.
           </p>
         </div>
 
         {/* Status Filter */}
-        <div className="flex items-center space-x-1.5 bg-[#0d1424] p-1 rounded-xl border border-[#1b263b]">
+        <div className="flex items-center space-x-1.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.06]">
           {(['ALL', 'CONFIRMED', 'PENDING', 'CANCELLED'] as const).map((status) => (
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 selectedStatus === status
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-sm'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -127,8 +126,8 @@ export const MyReservations: React.FC = () => {
         <div
           className={`p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between ${
             actionMessage.type === 'success'
-              ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-300'
-              : 'bg-red-950/50 border border-red-800 text-red-300'
+              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
+              : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
           }`}
         >
           <span>{actionMessage.text}</span>
@@ -141,13 +140,13 @@ export const MyReservations: React.FC = () => {
         </div>
       )}
 
-      {/* Bookings List */}
+      {/* Reservations List */}
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-44 rounded-2xl bg-[#0d1424] animate-pulse border border-[#1b263b]"
+              className="h-40 rounded-2xl bg-white/[0.03] animate-pulse border border-white/[0.06]"
             />
           ))}
         </div>
@@ -157,27 +156,25 @@ export const MyReservations: React.FC = () => {
             <ReservationCard
               key={res.id}
               reservation={res}
-              onCancel={res.status === 'CONFIRMED' ? handleCancelReservation : undefined}
+              onCancel={handleCancelReservation}
             />
           ))}
         </div>
       ) : (
-        <div className="p-16 text-center bg-[#0d1424] border border-[#1b263b] rounded-3xl space-y-4">
-          <Ticket className="w-12 h-12 text-slate-600 mx-auto" />
+        <div className="p-12 sm:p-16 text-center bg-[#0c101a] rounded-2xl border border-white/[0.08] space-y-4">
+          <Ticket className="w-10 h-10 text-slate-600 mx-auto" />
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-white">No bookings found</h3>
+            <h3 className="text-base font-bold text-white">No bookings found</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              {selectedStatus !== 'ALL'
-                ? `You have no ${selectedStatus.toLowerCase()} bookings.`
-                : 'You haven’t reserved any tickets yet. Explore movies to book your night!'}
+              You do not have any active or past reservations under this status.
             </p>
           </div>
           <Link
             to="/movies"
-            className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-colors shadow-lg shadow-amber-950/50"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-colors shadow-sm"
           >
-            <Film className="w-4 h-4" />
-            <span>Browse Now Showing</span>
+            <span>Explore Movies</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       )}
