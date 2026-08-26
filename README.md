@@ -1,121 +1,91 @@
-# Cinema
+# CINEMA — Movie Ticket Reservation & Seat Selection Platform
 
-Real-time online movie ticket reservation and interactive seat-selection platform for local
-cinemas in Ethiopia. Built with React + TypeScript + Vite on Firebase (Auth, Firestore, Cloud
-Functions), with Chapa as the payment gateway.
+Real-time online movie ticket reservation and interactive seat-selection platform for local cinemas in Ethiopia. Built with React 19 + TypeScript + Vite on the frontend and Express + Node.js + Firebase Admin SDK & Firestore on the authoritative backend, integrated with Chapa for payments and comprehensive administrative controls.
 
-This project originated from Google AI Studio. It has since been secured and connected to a real
-(non-fake) payment flow; the original UI/UX was preserved as-is.
+---
 
-## Architecture
+## Architecture & System Topology
 
 ```
-Browser (React/Vite)
-  ├─ Firebase Auth        — email/password accounts, CUSTOMER/ADMIN roles
-  ├─ Firestore            — catalog data (read directly); reservations/
-  │                          seat locks are READ directly but never
-  │                          WRITTEN directly except to cancel — writes
-  │                          are restricted by firestore.rules
-  └─ Cloud Functions       — the ONLY code allowed to create a reservation,
-     (functions/)            confirm a payment, or confirm a reservation.
-                              Calls out to Chapa server-side. Never trusts
-                              an amount/seat/status from the client.
+Client (React / Vite Single Page App)
+  ├─ Firebase Client SDK   — User Authentication, Real-time seat subscription (onSnapshot)
+  └─ Authoritative API     — Express Server (/api/*)
+       ├─ /api/auth        — Authentication verification & profile synchronization
+       ├─ /api/reservations— Atomic reservation creation, seat locking & cancellations
+       ├─ /api/payments    — Chapa payment initialization & webhook verification
+       ├─ /api/admin       — Multi-venue catalog management & RBAC enforcement
+       ├─ /api/health      — Health check & telemetry
+       └─ Rate Limiters    — Burst protection & brute-force mitigation
 ```
 
-Nothing about the reservation or payment result is ever decided in the browser. The client can
-*ask* the backend to reserve seats, start a payment, or check a payment; only
-`functions/src/index.ts`, running with the Firebase Admin SDK (which bypasses `firestore.rules`),
-is allowed to create a `reservations`/`reservationSeats` doc, write `payments/*.status`, or flip a
-reservation to `CONFIRMED`.
+### Security & Authority Guarantees
 
-## Firestore data model
+1. **Authoritative Backend**: All seat locks, reservation pricing calculations, and payment confirmations happen server-side inside atomic Firestore transactions. The client cannot send arbitrary prices or forge seat assignments.
+2. **Atomic Concurrency Protection**: Seat locks are keyed by `${showtimeId}_${seatId}`. If two users attempt to reserve the same seat simultaneously, exactly one succeeds and the other is returned an immediate `409 Conflict`.
+3. **Role-Based Access Control (RBAC)**: Only authorized administrators (`role: "ADMIN"`) can access administrative endpoints (`/api/admin/*`). Customer role elevation is restricted.
+4. **Audit Logging**: Sensitive administrative actions (movie creation, schedule updates, cancellations) are recorded in Firestore with sensitive fields (passwords, tokens, credentials) automatically sanitized and redacted.
+5. **Rate Limiting**: Tiered rate limiting protects authentication, booking, payment, and admin APIs against abuse.
 
-| Collection         | Purpose                                                              |
-|---------------------|-----------------------------------------------------------------------|
-| `users`             | Account profile + role (`CUSTOMER` \| `ADMIN`)                        |
-| `movies`            | Catalog: title, description, duration, genre, poster/trailer, etc.   |
-| `cinemas`           | Cinema branches                                                      |
-| `halls`             | Auditoriums, belong to a cinema                                      |
-| `seats`             | Physical seats, belong to a hall                                     |
-| `showtimes`         | A movie screening in a hall at a date/time, with the ticket price    |
-| `reservations`      | A customer's booking for a showtime (status, seats, total price)     |
-| `reservationSeats`  | Per-showtime seat lock, keyed `${showtimeId}_${seatId}` — this is what makes seat A1 independently AVAILABLE for one showtime and RESERVED for another |
-| `payments`          | Payment attempts, keyed by `reservationId`. Status is server-only.   |
+---
 
-## Security model
+## Automated Test Suite
 
-- **Firestore rules (`firestore.rules`)** — catalog data (`movies`, `cinemas`, `halls`, `seats`,
-  `showtimes`) is public-read, admin-only-write. `reservations` and `reservationSeats` **cannot be
-  created by the client at all** (`allow create: if false`) — only the `createReservationSecure`
-  Cloud Function creates them. Owners (and admins) may only ever transition a reservation to
-  `CANCELLED` via a direct write; `CONFIRMED` is never settable by any direct client write, by
-  anyone — only by Cloud Functions, after real payment verification. **`payments` are entirely
-  `allow write: if false`** — no client write path exists at all, by design.
-- **No self-elevation.** There is no code path, UI button, or rule that lets a user set their own
-  `role` to `ADMIN`. The very first admin must be set manually (Firebase Console → Firestore →
-  `users/{uid}` → `role: "ADMIN"`, or via `firebase firestore:update` from the CLI as a project
-  owner). Every admin after that is promoted from the in-app **Admin → Users** screen by an
-  existing admin — enforced server-side, not just hidden in the UI.
-- **No fake admin confirmations.** An admin can never mark an online (Chapa/Telebirr/Card)
-  payment "paid" from the dashboard — Firestore rules block it as a direct write, and the only
-  server path (`confirmOfflinePayment`) refuses any reservation whose linked payment record isn't
-  explicitly `PAY_AT_CINEMA`. Online reservations can only reach `CONFIRMED` via the Chapa
-  webhook/verify functions after independently verifying the transaction with Chapa.
-- **Server-verified reservation creation** — `createReservationSecure` (Cloud Function, Admin SDK)
-  re-reads the showtime, hall, and every seat inside a single Firestore transaction: it verifies
-  each seat actually belongs to the showtime's hall, computes `totalPrice` itself from the
-  showtime's stored `ticketPrice` × each seat's `priceModifier` (never a client-sent number), and
-  re-checks every `reservationSeats/{showtimeId}_{seatId}` doc for an active lock before creating
-  the reservation — aborting the whole transaction if any selected seat is already taken. Firestore
-  guarantees this transaction is atomic and serializable, so two users cannot both win the same
-  seat. `src/services/reservations.ts`'s `createReservationAtomic` is now a thin client wrapper
-  that calls this function; it does not compute price or touch Firestore directly.
-- **Seat-hold expiration** — every PENDING reservation gets an `expiresAt` (15 minutes from
-  creation). The scheduled `expirePendingReservations` Cloud Function runs every 2 minutes,
-  cancelling any PENDING reservation past its `expiresAt` and releasing its seat locks; cancelled
-  reservations are kept for history (`status: CANCELLED`, `cancelReason: EXPIRED`), never deleted.
-  The seat map also filters out expired-but-not-yet-swept locks client-side, so a seat appears
-  available again immediately rather than waiting for the next sweep — while the transaction inside
-  `createReservationSecure` independently re-checks expiry anyway, so this is a UX nicety, not the
-  security boundary.
-- **Payment verification** — see below.
+A comprehensive test suite is included to verify all priority business logic:
 
-## Payment flow (Chapa)
-
-```
-Customer clicks Pay
-  → client calls initializePayment({ reservationId, method })   [Cloud Function]
-  → function reads reservation.totalPrice (server truth), NOT any client amount
-  → CHAPA/TELEBIRR/CARD: calls Chapa's initialize API, stores payment PENDING,
-    returns a checkout_url; client redirects the browser there
-  → PAY_AT_CINEMA: stores payment PENDING, reservation stays PENDING
-    (seats are already locked; staff confirm payment at the counter later
-    via the admin dashboard, which calls confirmOfflinePayment — the only
-    path that can flip a PAY_AT_CINEMA reservation to CONFIRMED)
-  → customer pays on Chapa's hosted page
-  → Chapa calls our chapaWebhook (server-to-server)
-  → webhook independently calls Chapa's verify API (never trusts the
-    webhook body alone), checks amount + currency match what we stored
-  → only if verified: payment → SUCCESS, reservation → CONFIRMED (atomic
-    Firestore transaction, idempotent against duplicate webhook deliveries)
-  → customer is redirected back to /payment/callback, which calls
-    verifyPayment (a second, client-triggerable path to the same
-    server-side verification) in case the webhook hasn't landed yet —
-    this page never marks anything paid on its own, it only displays
-    whatever the backend reports
+```bash
+npm test
 ```
 
-If `CHAPA_SECRET_KEY` isn't configured, `initializePayment` rejects online payment methods with a
-clear "gateway not configured" error. `PAY_AT_CINEMA` still works with no gateway at all, since no
-money is being processed by the app in that case.
+### Test Coverage Areas
 
-## Local development
+- **Authentication & RBAC (`tests/auth.test.ts`)**: Verifies admin email validation, role restrictions, and forbidden customer elevation.
+- **Reservations & Pricing (`tests/reservations.test.ts`)**: Verifies server-calculated prices, VIP modifiers, booking code formats, 15-minute hold windows, and data ownership.
+- **Concurrency & Seat Locking (`tests/concurrency.test.ts`)**: Simulates simultaneous booking attempts on the same seat to guarantee single-winner atomic execution.
+- **Payment Verification (`tests/payments.test.ts`)**: Verifies amount match, currency verification (ETB), price tampering rejection, and webhook idempotency.
+- **Showtime Conflict Detection (`tests/showtimes.test.ts`)**: Verifies hall scheduling conflict prevention, multi-hall parallelism, and multi-cinema independence.
+- **Audit Logging Security (`tests/auditLog.test.ts`)**: Tests automatic stripping of secrets, passwords, and tokens before writing logs.
+- **Rate Limiting (`tests/rateLimiter.test.ts`)**: Verifies threshold enforcement and client IP burst protection.
+
+---
+
+## Environment Configuration
+
+| Variable | Description |
+|---|---|
+| `PORT` | Web server port (Default: `3000`) |
+| `NODE_ENV` | Runtime environment (`development` \| `production`) |
+| `FRONTEND_URL` | Allowed CORS origin for production |
+| `ADMIN_EMAILS` | Comma-separated list of authorized admin email addresses |
+| `CHAPA_SECRET_KEY` | Chapa merchant API secret key for payment processing |
+| `CHAPA_PUBLIC_KEY` | Chapa public key for client integration |
+| `CHAPA_WEBHOOK_SECRET` | Chapa webhook signature verification secret |
+| `BOOTSTRAP_ADMIN_PASSWORD` | Optional password override for initial admin provisioning |
+
+---
+
+## Deployment & Production Build
+
+### Building the Application
+
+```bash
+npm run build
+```
+
+This builds the Vite frontend into `dist/` and bundles the standalone Express server to `dist/server.cjs` via `esbuild`.
+
+### Starting the Server
+
+```bash
+npm start
+```
+
+## Local Development & Setup
 
 **Prerequisites:** Node.js 20+
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in your Firebase project's public config
+cp .env.example .env
 npm run dev
 ```
 

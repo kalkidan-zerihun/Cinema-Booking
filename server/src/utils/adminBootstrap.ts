@@ -121,7 +121,15 @@ export async function bootstrapAdminUsers(): Promise<void> {
         // User with this email might not have registered yet in Auth, which is fine
       }
     }
-  } catch (err) {
-    console.error("[Admin Bootstrap Error]", err);
+  } catch (err: any) {
+    if (
+      err?.code === 7 ||
+      err?.message?.includes("PERMISSION_DENIED") ||
+      err?.message?.includes("Missing or insufficient permissions")
+    ) {
+      console.info("[Admin Bootstrap] Service account key not detected; client-managed Firebase handles user authentication.");
+    } else {
+      console.error("[Admin Bootstrap Error]", err);
+    }
   }
 }

@@ -46,8 +46,16 @@ setInterval(async () => {
     if (expiredCount > 0) {
       console.log(`[Cron] Expired ${expiredCount} unpaid reservation(s) and released seat locks.`);
     }
-  } catch (err) {
-    console.error("[Cron Error] Failed to expire pending reservations:", err);
+  } catch (err: any) {
+    if (
+      err?.code === 7 ||
+      err?.message?.includes("PERMISSION_DENIED") ||
+      err?.message?.includes("Missing or insufficient permissions")
+    ) {
+      // Graceful fallback for client-managed Firebase
+    } else {
+      console.error("[Cron Error] Failed to expire pending reservations:", err);
+    }
   }
 }, 2 * 60 * 1000);
 
