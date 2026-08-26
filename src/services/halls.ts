@@ -3,19 +3,24 @@ import {
   doc,
   getDocs,
   getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   query,
   where,
   onSnapshot,
-  serverTimestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { Hall } from '../types';
 import { INITIAL_HALLS } from './seedData';
 
 const COLLECTION_NAME = 'halls';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+
+async function getAuthToken(): Promise<string> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error('Authentication required for administrative operations.');
+  }
+  return await currentUser.getIdToken();
+}
 
 export const getHalls = async (): Promise<Hall[]> => {
   try {
@@ -66,25 +71,50 @@ export const getHallById = async (hallId: string): Promise<Hall | null> => {
 };
 
 export const createHall = async (hallData: Omit<Hall, 'id'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-    ...hallData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/halls`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(hallData),
   });
-  return docRef.id;
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to create hall.');
+  }
+  return data.data?.id || '';
 };
 
 export const updateHall = async (hallId: string, hallData: Partial<Hall>): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, hallId);
-  await updateDoc(docRef, {
-    ...hallData,
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/halls/${hallId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(hallData),
   });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to update hall.');
+  }
 };
 
 export const deleteHall = async (hallId: string): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, hallId);
-  await deleteDoc(docRef);
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/halls/${hallId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to delete hall.');
+  }
 };
 
 export const subscribeToHalls = (callback: (halls: Hall[]) => void) => {
@@ -102,3 +132,4 @@ export const subscribeToHalls = (callback: (halls: Hall[]) => void) => {
     }
   );
 };
+

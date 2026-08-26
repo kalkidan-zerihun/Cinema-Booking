@@ -2,6 +2,8 @@ import { Router, Response } from "express";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "../firebase.ts";
 import { authenticate, requireAdmin, AuthenticatedRequest } from "../middleware/auth.ts";
+import { reservationRateLimiter } from "../middleware/rateLimit.ts";
+import { logAdminAction } from "../utils/auditLog.ts";
 
 const router = Router();
 
@@ -22,7 +24,7 @@ function getIdParam(param: string | string[] | undefined): string {
 
 function generateBookingCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let result = "KC-";
+  let result = "CN-";
   for (let i = 0; i < 6; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }

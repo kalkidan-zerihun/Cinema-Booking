@@ -3,15 +3,11 @@ import {
   doc,
   getDocs,
   getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   query,
   where,
   onSnapshot,
-  serverTimestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { Showtime, EnrichedShowtime } from '../types';
 import { getMovieById } from './movies';
 import { getCinemaById } from './cinemas';
@@ -19,6 +15,15 @@ import { getHallById } from './halls';
 import { getInitialShowtimes } from './seedData';
 
 const COLLECTION_NAME = 'showtimes';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+
+async function getAuthToken(): Promise<string> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error('Authentication required for administrative operations.');
+  }
+  return await currentUser.getIdToken();
+}
 
 export const getShowtimes = async (): Promise<Showtime[]> => {
   try {
@@ -103,28 +108,53 @@ export const getEnrichedShowtime = async (showtimeId: string): Promise<EnrichedS
 };
 
 export const createShowtime = async (showtimeData: Omit<Showtime, 'id'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-    ...showtimeData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/showtimes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(showtimeData),
   });
-  return docRef.id;
+  const resData = await res.json().catch(() => null);
+  if (!res.ok || !resData?.success) {
+    throw new Error(resData?.message || 'Failed to create showtime.');
+  }
+  return resData.data?.id || '';
 };
 
 export const updateShowtime = async (
   showtimeId: string,
   showtimeData: Partial<Showtime>
 ): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, showtimeId);
-  await updateDoc(docRef, {
-    ...showtimeData,
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/showtimes/${showtimeId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(showtimeData),
   });
+  const resData = await res.json().catch(() => null);
+  if (!res.ok || !resData?.success) {
+    throw new Error(resData?.message || 'Failed to update showtime.');
+  }
 };
 
 export const deleteShowtime = async (showtimeId: string): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, showtimeId);
-  await deleteDoc(docRef);
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/showtimes/${showtimeId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const resData = await res.json().catch(() => null);
+  if (!res.ok || !resData?.success) {
+    throw new Error(resData?.message || 'Failed to delete showtime.');
+  }
 };
 
 export const subscribeToShowtimes = (callback: (showtimes: Showtime[]) => void) => {
@@ -142,3 +172,4 @@ export const subscribeToShowtimes = (callback: (showtimes: Showtime[]) => void) 
     }
   );
 };
+

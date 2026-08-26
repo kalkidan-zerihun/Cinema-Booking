@@ -3,19 +3,24 @@ import {
   doc,
   getDocs,
   getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { Movie } from '../types';
 import { INITIAL_MOVIES } from './seedData';
 
 const COLLECTION_NAME = 'movies';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+
+async function getAuthToken(): Promise<string> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error('Authentication required for administrative operations.');
+  }
+  return await currentUser.getIdToken();
+}
 
 export const getMovies = async (): Promise<Movie[]> => {
   try {
@@ -61,25 +66,50 @@ export const getMovieById = async (movieId: string): Promise<Movie | null> => {
 };
 
 export const createMovie = async (movieData: Omit<Movie, 'id'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-    ...movieData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/movies`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(movieData),
   });
-  return docRef.id;
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to create movie.');
+  }
+  return data.data?.id || '';
 };
 
 export const updateMovie = async (movieId: string, movieData: Partial<Movie>): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, movieId);
-  await updateDoc(docRef, {
-    ...movieData,
-    updatedAt: serverTimestamp(),
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(movieData),
   });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to update movie.');
+  }
 };
 
 export const deleteMovie = async (movieId: string): Promise<void> => {
-  const docRef = doc(db, COLLECTION_NAME, movieId);
-  await deleteDoc(docRef);
+  const token = await getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to delete movie.');
+  }
 };
 
 export const subscribeToMovies = (callback: (movies: Movie[]) => void) => {
@@ -103,3 +133,4 @@ export const subscribeToMovies = (callback: (movies: Movie[]) => void) => {
     }
   );
 };
+

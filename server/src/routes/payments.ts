@@ -172,11 +172,11 @@ router.post("/initialize", authenticate, async (req: AuthenticatedRequest, res: 
       return;
     }
 
-    const txRef = `KC-${reservationId}-${Date.now()}`;
+    const txRef = `CN-${reservationId}-${Date.now()}`;
     const [firstName, ...rest] = String(reservation.customerName || "Cinema Guest").split(" ");
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const serverUrl = `http://localhost:${process.env.PORT || 3001}`;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const serverUrl = process.env.BACKEND_URL || "http://localhost:3000";
 
     const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 
@@ -185,7 +185,7 @@ router.post("/initialize", authenticate, async (req: AuthenticatedRequest, res: 
       const result = await initializeChapaPayment(chapaSecretKey, {
         amount,
         currency: "ETB",
-        email: reservation.customerEmail || req.user?.email || "guest@kalicinema.com",
+        email: reservation.customerEmail || req.user?.email || "guest@cinema.com",
         firstName: firstName || "Cinema",
         lastName: rest.join(" ") || "Guest",
         txRef,

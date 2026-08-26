@@ -5,12 +5,10 @@ import {
   getDoc,
   query,
   where,
-  runTransaction,
   onSnapshot,
   orderBy,
 } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import { db, auth, functions } from './firebase';
+import { db, auth } from './firebase';
 import { Reservation, ReservationSeat, EnrichedReservation } from '../types';
 import { getShowtimeById } from './showtimes';
 import { getMovieById } from './movies';
@@ -25,22 +23,13 @@ const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
 async function getAuthToken(): Promise<string> {
   const currentUser = auth.currentUser;
   if (!currentUser) {
-    throw new Error('Authentication required to make a reservation.');
+    throw new Error('Authentication required to perform this action.');
   }
   return await currentUser.getIdToken();
 }
 
-function generateBookingCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = 'KC-';
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
 /**
- * ATOMIC, SERVER-VERIFIED RESERVATION CREATION WITH FIRESTORE FALLBACK
+ * ATOMIC, AUTHORITATIVE RESERVATION CREATION VIA EXPRESS BACKEND
  */
 export const createReservationAtomic = async (params: {
   showtimeId: string;
@@ -52,124 +41,31 @@ export const createReservationAtomic = async (params: {
     throw new Error('Please select at least one seat to proceed.');
   }
 
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    throw new Error('Authentication required to make a reservation.');
-  }
+  const token = await getAuthToken();
 
-  try {
-    const token = await currentUser.getIdToken();
-    const response = await fetch(`${API_BASE_URL}/reservations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(params),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.success && data.data) {
-        return data.data as Reservation;
-      }
-    }
-  } catch (apiErr) {
-    console.warn('Backend reservation API call failed, falling back to direct Firestore transaction:', apiErr);
-  }
-
-  // Client-side atomic transaction fallback
-  const uniqueSeatIds = Array.from(new Set(params.seatIds));
-  return await runTransaction(db, async (tx) => {
-    const showtimeRef = doc(db, 'showtimes', params.showtimeId);
-    const showtimeSnap = await tx.get(showtimeRef);
-    if (!showtimeSnap.exists()) {
-      throw new Error('Showtime not found or has been removed.');
-    }
-    const showtime = showtimeSnap.data()!;
-    const hallId = showtime.hallId;
-    const ticketPrice = Number(showtime.ticketPrice) || 250;
-
-    const seatSnaps = await Promise.all(
-      uniqueSeatIds.map((id) => tx.get(doc(db, 'seats', id)))
-    );
-    const seatLabels: string[] = [];
-    let calculatedTotalPrice = 0;
-
-    for (let i = 0; i < uniqueSeatIds.length; i++) {
-      const seatSnap = seatSnaps[i];
-      if (!seatSnap.exists()) {
-        throw new Error(`Seat ${uniqueSeatIds[i]} does not exist.`);
-      }
-      const seat = seatSnap.data()!;
-      seatLabels.push(seat.label || `${seat.row}${seat.number}`);
-      const priceModifier = Number(seat.priceModifier) || 1.0;
-      calculatedTotalPrice += Math.round(ticketPrice * priceModifier);
-    }
-
-    const now = Date.now();
-    const resSeatRefs = uniqueSeatIds.map((seatId) =>
-      doc(db, RESERVATION_SEATS_COLLECTION, `${params.showtimeId}_${seatId}`)
-    );
-    const resSeatSnaps = await Promise.all(resSeatRefs.map((ref) => tx.get(ref)));
-
-    for (let i = 0; i < resSeatSnaps.length; i++) {
-      const snap = resSeatSnaps[i];
-      if (!snap.exists()) continue;
-      const data = snap.data()!;
-      const stillActive =
-        data.status === 'RESERVED' &&
-        (!data.expiresAt || new Date(data.expiresAt).getTime() > now);
-      if (stillActive) {
-        throw new Error(`Seat ${seatLabels[i] || uniqueSeatIds[i]} is no longer available.`);
-      }
-    }
-
-    const newResRef = doc(collection(db, RESERVATIONS_COLLECTION));
-    const nowIso = new Date(now).toISOString();
-    const expiresAt = new Date(now + 15 * 60 * 1000).toISOString();
-    const bookingCode = generateBookingCode();
-
-    const reservationPayload = {
-      userId: currentUser.uid,
-      showtimeId: params.showtimeId,
-      status: 'PENDING' as const,
-      totalPrice: calculatedTotalPrice,
-      seatIds: uniqueSeatIds,
-      seatLabels,
-      customerName: params.customerName || currentUser.displayName || 'Cinema Guest',
-      customerEmail: params.customerEmail || currentUser.email || '',
-      bookingCode,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-      expiresAt,
-    };
-
-    tx.set(newResRef, reservationPayload);
-
-    for (let i = 0; i < uniqueSeatIds.length; i++) {
-      tx.set(resSeatRefs[i], {
-        reservationId: newResRef.id,
-        seatId: uniqueSeatIds[i],
-        showtimeId: params.showtimeId,
-        status: 'RESERVED',
-        createdAt: nowIso,
-        expiresAt,
-      });
-    }
-
-    return { id: newResRef.id, ...reservationPayload };
+  const response = await fetch(`${API_BASE_URL}/reservations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(params),
   });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok || !data?.success) {
+    throw new Error(
+      data?.message || "We couldn't reserve those seats. Please try again."
+    );
+  }
+
+  return data.data as Reservation;
 };
 
 /**
  * Get all reserved seats for a given showtime (real-time helper or one-off)
  */
-// A seat lock still blocks a seat if it is CONFIRMED (no expiresAt), or
-// PENDING and its hold hasn't expired yet. This mirrors the check inside
-// createReservationSecure so the UI doesn't show a seat as taken once its
-// hold has lapsed, even in the couple of minutes before the scheduled
-// expirePendingReservations function formally cancels it server-side.
 const isSeatLockActive = (data: any): boolean => {
   if (data.status !== 'RESERVED') return false;
   if (!data.expiresAt) return true;
@@ -290,56 +186,27 @@ export const getAllReservations = async (): Promise<Reservation[]> => {
 };
 
 /**
- * Cancels an eligible reservation and atomically frees up the seats for that showtime.
+ * Cancels an eligible reservation via Express backend API.
  */
 export const cancelReservation = async (reservationId: string): Promise<void> => {
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    throw new Error('Authentication required.');
-  }
-
-  await runTransaction(db, async (transaction) => {
-    const resRef = doc(db, RESERVATIONS_COLLECTION, reservationId);
-    const resSnap = await transaction.get(resRef);
-
-    if (!resSnap.exists()) {
-      throw new Error('Reservation does not exist.');
-    }
-
-    const resData = resSnap.data() as Reservation;
-
-    if (resData.status === 'CANCELLED') {
-      throw new Error('This reservation has already been cancelled.');
-    }
-
-    // Update reservation status
-    transaction.update(resRef, {
-      status: 'CANCELLED',
-      updatedAt: new Date().toISOString(),
-    });
-
-    // Update or clear each reservationSeat record so seats become available again
-    if (resData.seatIds && resData.seatIds.length > 0) {
-      for (const seatId of resData.seatIds) {
-        const resSeatDocId = `${resData.showtimeId}_${seatId}`;
-        const resSeatRef = doc(db, RESERVATION_SEATS_COLLECTION, resSeatDocId);
-        transaction.update(resSeatRef, {
-          status: 'CANCELLED',
-          updatedAt: new Date().toISOString(),
-        });
-      }
-    }
+  const token = await getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/reservations/${reservationId}/cancel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
   });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to cancel reservation.');
+  }
 };
 
 /**
  * Admin-only: confirms a PENDING reservation that is being paid for at
- * the cinema counter (PAY_AT_CINEMA). Runs server-side via the
- * confirmOfflinePayment Cloud Function, which independently checks the
- * caller is an admin and that the linked payment record actually shows
- * PAY_AT_CINEMA — Firestore rules deny this transition as a direct
- * client write, for both customers and admins, so there is no way to
- * fake-confirm an online (Chapa/Telebirr/Card) payment from the browser.
+ * the cinema counter (PAY_AT_CINEMA).
  */
 export const confirmOfflinePayment = async (reservationId: string): Promise<void> => {
   const token = await getAuthToken();
@@ -351,8 +218,8 @@ export const confirmOfflinePayment = async (reservationId: string): Promise<void
     },
   });
 
-  const data = await response.json();
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || 'Failed to confirm reservation.');
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.success) {
+    throw new Error(data?.message || 'Failed to confirm reservation.');
   }
 };

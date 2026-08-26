@@ -166,31 +166,24 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
  */
 export const updateUserRole = async (uid: string, newRole: UserRole): Promise<void> => {
   const currentUser = auth.currentUser;
-  if (currentUser) {
-    try {
-      const token = await currentUser.getIdToken();
-      const res = await fetch(`${API_BASE_URL}/admin/users/${uid}/role`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ role: newRole }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return;
-      }
-    } catch (err) {
-      console.warn('Backend admin user role update failed, attempting Firestore direct write:', err);
-    }
+  if (!currentUser) {
+    throw new Error('Authentication required.');
   }
 
-  const userDocRef = doc(db, 'users', uid);
-  await updateDoc(userDocRef, {
-    role: newRole,
-    updatedAt: serverTimestamp(),
+  const token = await currentUser.getIdToken();
+  const res = await fetch(`${API_BASE_URL}/admin/users/${uid}/role`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ role: newRole }),
   });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json?.success) {
+    throw new Error(json?.message || 'Failed to update user role.');
+  }
 };
 
 export const getAllUsers = async (): Promise<UserProfile[]> => {
