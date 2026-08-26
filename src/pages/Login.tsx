@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Film, LogIn, Lock, Mail, AlertCircle, Sparkles, ShieldCheck } from 'lucide-react';
+import { Film, LogIn, Lock, Mail, AlertCircle, ShieldCheck, UserCheck, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
@@ -8,15 +8,15 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingPreset, setLoadingPreset] = useState<string | null>(null);
 
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
+  const handleSignInWith = async (loginEmail: string, loginPass: string) => {
+    if (!loginEmail || !loginPass) {
       setError('Please enter both email and password.');
       return;
     }
@@ -24,7 +24,7 @@ export const Login: React.FC = () => {
     setError(null);
     setSubmitting(true);
     try {
-      await login(email.trim(), password);
+      await login(loginEmail.trim(), loginPass);
       navigate(redirect, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
@@ -33,7 +33,7 @@ export const Login: React.FC = () => {
         err.code === 'auth/user-not-found' ||
         err.code === 'auth/wrong-password'
       ) {
-        setError('Invalid email or password. Please check your credentials or register a new account.');
+        setError('Invalid email or password. If you do not have an account yet, please create one or use the Demo presets.');
       } else if (err.code === 'auth/too-many-requests') {
         setError('Access temporarily disabled due to many failed attempts. Please try again later.');
       } else {
@@ -41,17 +41,20 @@ export const Login: React.FC = () => {
       }
     } finally {
       setSubmitting(false);
+      setLoadingPreset(null);
     }
   };
 
-  const fillDemoCustomer = () => {
-    setEmail('guest@kalicinema.com');
-    setPassword('Cinema12345!');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSignInWith(email, password);
   };
 
-  const fillDemoAdmin = () => {
-    setEmail('admin@kalicinema.com');
-    setPassword('Admin12345!');
+  const handleDemoSignIn = async (demoEmail: string, demoPass: string, label: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setLoadingPreset(label);
+    await handleSignInWith(demoEmail, demoPass);
   };
 
   return (
@@ -71,9 +74,20 @@ export const Login: React.FC = () => {
 
         {/* Error Notification */}
         {error && (
-          <div className="flex items-start space-x-2.5 p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-red-300 text-xs">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="flex flex-col space-y-2 p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-red-300 text-xs">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+            {email && (
+              <Link
+                to={`/register?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirect)}`}
+                className="inline-flex items-center space-x-1 font-bold text-red-400 hover:text-red-300 pt-1 text-[11px] underline"
+              >
+                <span>Register account with &quot;{email}&quot;</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            )}
           </div>
         )}
 
@@ -117,7 +131,7 @@ export const Login: React.FC = () => {
             disabled={submitting}
             className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-[#e50914] text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-950/60 disabled:opacity-50"
           >
-            {submitting ? (
+            {submitting && !loadingPreset ? (
               <span>Signing In...</span>
             ) : (
               <>
@@ -128,26 +142,31 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Demo Fast Fills */}
-        <div className="pt-2 border-t border-[#1e202e] space-y-2 text-center">
+        {/* 1-Click Demo Fast Sign-in */}
+        <div className="pt-3 border-t border-[#1e202e] space-y-2.5 text-center">
           <span className="text-[11px] font-bold uppercase text-gray-400 block tracking-wider">
-            Demo Credentials Auto-Fill
+            1-Click Demo Sign In
           </span>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
-              onClick={fillDemoCustomer}
-              className="py-2 px-3 rounded-lg text-xs font-semibold bg-[#181926] text-gray-300 hover:text-white hover:bg-[#232537] border border-[#2a2d40] transition-colors"
+              id="demo-customer-btn"
+              disabled={submitting}
+              onClick={() => handleDemoSignIn('guest@kalicinema.com', 'Cinema12345!', 'customer')}
+              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[#181926] text-gray-300 hover:text-white hover:bg-[#232537] border border-[#2a2d40] transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
             >
-              Demo Customer
+              <UserCheck className="w-3.5 h-3.5 text-blue-400" />
+              <span>{loadingPreset === 'customer' ? 'Signing In...' : 'Customer Demo'}</span>
             </button>
             <button
               type="button"
-              onClick={fillDemoAdmin}
-              className="py-2 px-3 rounded-lg text-xs font-semibold bg-red-950/30 text-red-400 hover:text-red-300 hover:bg-red-900/40 border border-red-900/50 transition-colors flex items-center justify-center space-x-1"
+              id="demo-admin-btn"
+              disabled={submitting}
+              onClick={() => handleDemoSignIn('admin@kalicinema.com', 'Admin12345!', 'admin')}
+              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-red-950/30 text-red-400 hover:text-red-300 hover:bg-red-900/40 border border-red-900/50 transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Demo Admin</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
+              <span>{loadingPreset === 'admin' ? 'Signing In...' : 'Admin Demo'}</span>
             </button>
           </div>
         </div>

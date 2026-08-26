@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
   Search,
   ArrowLeft,
-  Mail,
-  Phone,
-  UserCheck,
 } from 'lucide-react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../services/firebase';
 import { UserProfile, UserRole } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { getAllUsers, updateUserRole } from '../../services/auth';
 
 export const AdminUsers: React.FC = () => {
   const { currentUser } = useAuth();
@@ -26,19 +19,7 @@ export const AdminUsers: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, 'users'));
-      const list: UserProfile[] = snap.docs.map((d) => {
-        const data = d.data();
-        return {
-          uid: d.id,
-          name: data.name || '',
-          email: data.email || '',
-          role: (data.role as UserRole) || 'CUSTOMER',
-          phone: data.phone,
-          createdAt: data.createdAt || new Date().toISOString(),
-          updatedAt: data.updatedAt,
-        };
-      });
+      const list = await getAllUsers();
       setUsers(list);
     } catch (err: any) {
       console.error('Error loading users:', err);
@@ -62,13 +43,10 @@ export const AdminUsers: React.FC = () => {
     }
 
     try {
-      await updateDoc(doc(db, 'users', userId), {
-        role: nextRole,
-        updatedAt: new Date().toISOString(),
-      });
+      await updateUserRole(userId, nextRole);
       setMessage({
         type: 'success',
-        text: `Role for ${userEmail} changed to ${nextRole}.`,
+        text: `Role for ${userEmail || userId} changed to ${nextRole}.`,
       });
       await fetchUsers();
     } catch (err: any) {
@@ -151,50 +129,64 @@ export const AdminUsers: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#1e202e]">
-              {filteredUsers.map((u) => (
-                <tr key={u.id} className="hover:bg-[#181a27]">
-                  <td className="px-5 py-3 font-bold text-white">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="w-8 h-8 rounded-full bg-red-950 text-red-400 border border-red-800 flex items-center justify-center font-black text-xs">
-                        {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
-                      </div>
-                      <span>{u.name || 'Member'}</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="space-y-0.5">
-                      <span className="text-gray-200 block">{u.email}</span>
-                      {u.phone && <span className="text-gray-400 text-[11px] block">{u.phone}</span>}
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        u.role === 'ADMIN'
-                          ? 'bg-red-950 text-red-400 border border-red-800'
-                          : 'bg-[#1b1c2b] text-gray-300 border border-[#2b2d42]'
-                      }`}
-                    >
-                      {u.role || 'CUSTOMER'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-gray-400">
-                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleChangeRole(u.id, u.role || 'CUSTOMER', u.email)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                        u.role === 'ADMIN'
-                          ? 'bg-[#1a1c2a] text-gray-300 hover:text-white hover:bg-[#25283c] border border-[#2a2d40]'
-                          : 'bg-red-950/40 text-red-400 hover:bg-red-900/50 border border-red-900/60'
-                      }`}
-                    >
-                      {u.role === 'ADMIN' ? 'Demote to Customer' : 'Make Administrator'}
-                    </button>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
+                    Loading user accounts...
                   </td>
                 </tr>
-              ))}
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
+                    No users found matching your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map((u) => (
+                  <tr key={u.uid} className="hover:bg-[#181a27]">
+                    <td className="px-5 py-3 font-bold text-white">
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-full bg-red-950 text-red-400 border border-red-800 flex items-center justify-center font-black text-xs">
+                          {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                        <span>{u.name || 'Member'}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="space-y-0.5">
+                        <span className="text-gray-200 block">{u.email}</span>
+                        {u.phone && <span className="text-gray-400 text-[11px] block">{u.phone}</span>}
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          u.role === 'ADMIN'
+                            ? 'bg-red-950 text-red-400 border border-red-800'
+                            : 'bg-[#1b1c2b] text-gray-300 border border-[#2b2d42]'
+                        }`}
+                      >
+                        {u.role || 'CUSTOMER'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-gray-400">
+                      {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button
+                        onClick={() => handleChangeRole(u.uid, u.role || 'CUSTOMER', u.email)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                          u.role === 'ADMIN'
+                            ? 'bg-[#1a1c2a] text-gray-300 hover:text-white hover:bg-[#25283c] border border-[#2a2d40]'
+                            : 'bg-red-950/40 text-red-400 hover:bg-red-900/50 border border-red-900/60'
+                        }`}
+                      >
+                        {u.role === 'ADMIN' ? 'Demote to Customer' : 'Make Administrator'}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

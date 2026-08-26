@@ -4,8 +4,12 @@ import { Film, UserPlus, Lock, Mail, User, Phone, AlertCircle, Sparkles } from '
 import { useAuth } from '../context/AuthContext';
 
 export const Register: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/';
+  const initialEmail = searchParams.get('email') || '';
+
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,8 +18,6 @@ export const Register: React.FC = () => {
 
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

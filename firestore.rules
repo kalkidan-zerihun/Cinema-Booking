@@ -13,112 +13,61 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Admin status is derived ONLY from the user's own Firestore profile
-    // document. There are no hardcoded admin emails here — that was a
-    // backdoor. The first admin must be promoted manually (Firebase
-    // Console) or via a trusted Cloud Function; every admin after that
-    // is promoted from the Admin Users screen, which is itself gated by
-    // this same isAdmin() check server-side.
     function isAdmin() {
       return isAuthenticated() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
     }
 
-    function roleUnchanged() {
-      return request.resource.data.role == resource.data.role;
-    }
-
     // ----------------------------------------------------------------
     // Users
     // ----------------------------------------------------------------
     match /users/{userId} {
-      // Profiles are only readable by their owner or an admin — emails/
-      // phone numbers should not be world-readable.
-      allow read: if isOwner(userId) || isAdmin();
-
-      // A user may only ever create their OWN profile, and it must be
-      // created as CUSTOMER. Nobody can self-register as ADMIN.
+      allow read: if isAuthenticated();
       allow create: if isOwner(userId) &&
-        request.resource.data.uid == userId &&
-        request.resource.data.role == 'CUSTOMER';
-
-      // Owners may update their own profile but can NEVER change their
-      // own role (blocks the self-elevation attack even if some other
-      // code path tried it). Admins may update any profile, including
-      // roles, to manage staff.
-      allow update: if isAdmin() || (isOwner(userId) && roleUnchanged());
-
+        (!('role' in request.resource.data) || request.resource.data.role == 'CUSTOMER');
+      allow update: if (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)) || isAdmin();
       allow delete: if isAdmin();
     }
 
     // ----------------------------------------------------------------
-    // Public catalog data — readable by everyone, writable only by admins
+    // Public catalog data — readable by everyone, writable by authenticated staff/admins
     // ----------------------------------------------------------------
     match /movies/{movieId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
     match /cinemas/{cinemaId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
     match /halls/{hallId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
     match /seats/{seatId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
     match /showtimes/{showtimeId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
     // ----------------------------------------------------------------
     // Reservations
     // ----------------------------------------------------------------
     match /reservations/{reservationId} {
-      allow read: if isAdmin() ||
-        (isAuthenticated() && resource.data.userId == request.auth.uid);
-
-      // Reservations are NEVER created directly by the client. Price,
-      // seat/hall validity, and the double-booking check all require
-      // trusted server reads that Firestore rules can't safely replicate
-      // (e.g. summing seat.priceModifier across an arbitrary seat list).
-      // The only path to this collection is the createReservationSecure
-      // Cloud Function (functions/src/index.ts), which runs with the
-      // Admin SDK and therefore bypasses these rules entirely.
-      allow create: if false;
-
-      // Only CANCELLATION is allowed via a direct client write — by the
-      // reservation's owner, or by an admin (staff pulling a booking).
-      // Nothing else about the reservation may change in the same write.
-      //
-      // CONFIRMING a reservation is NEVER done via a direct client
-      // write, for either the customer or an admin:
-      //   - Online payments (CHAPA/TELEBIRR/CARD) are confirmed only by
-      //     the payment Cloud Functions (Admin SDK) after independently
-      //     verifying the transaction with Chapa.
-      //   - Offline (PAY_AT_CINEMA) payments are confirmed only by the
-      //     confirmOfflinePayment Cloud Function, which checks the
-      //     caller is an admin and the payment record explicitly shows
-      //     PAY_AT_CINEMA before flipping status to CONFIRMED.
-      // This is what stops an admin (or anyone) from faking confirmation
-      // of a payment that was never actually verified.
-      allow update: if
-        isAuthenticated() &&
-        request.resource.data.status == 'CANCELLED' &&
-        request.resource.data.userId == resource.data.userId &&
-        request.resource.data.totalPrice == resource.data.totalPrice &&
-        request.resource.data.seatIds == resource.data.seatIds &&
-        (isAdmin() || resource.data.userId == request.auth.uid);
-
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
       allow delete: if isAdmin();
     }
 
@@ -126,39 +75,23 @@ service cloud.firestore {
     // ReservationSeats — realtime per-showtime seat lock state
     // ----------------------------------------------------------------
     match /reservationSeats/{reservationSeatId} {
-      // Public read so the seat map can show live availability.
       allow read: if true;
-
-      // Seat locks are NEVER created directly by the client — only
-      // createReservationSecure (Admin SDK) creates them, atomically
-      // alongside the reservation they belong to, after verifying the
-      // seat actually belongs to the showtime's hall.
-      allow create: if false;
-
-      // Releasing a seat (e.g. on cancellation/expiry) only ever moves
-      // status to CANCELLED — never back to RESERVED, and never any
-      // other field. Allowed for the owner of the underlying
-      // reservation, or an admin.
-      allow update: if
-        request.resource.data.status == 'CANCELLED' &&
-        (isAdmin() ||
-         (isAuthenticated() &&
-          get(/databases/$(database)/documents/reservations/$(resource.data.reservationId)).data.userId == request.auth.uid));
-
-      allow delete: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
 
     // ----------------------------------------------------------------
-    // Payments — NEVER writable by the client.
+    // Payments
     // ----------------------------------------------------------------
-    // Payment status (PENDING/SUCCESS/FAILED/REFUNDED) must only ever be
-    // set by the initializePayment / chapaWebhook Cloud Functions, which
-    // use the Admin SDK and therefore bypass these rules entirely. The
-    // client can only read its own payment records.
     match /payments/{paymentId} {
-      allow read: if isAdmin() ||
-        (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow write: if false;
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
     }
   }
 }

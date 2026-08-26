@@ -18,6 +18,7 @@ import { getMovies, subscribeToMovies } from '../services/movies';
 import { getCinemas } from '../services/cinemas';
 import { MovieCard } from '../components/MovieCard';
 import { TrailerModal } from '../components/TrailerModal';
+import { seedCinemaData } from '../services/seedData';
 
 export const Home: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -26,16 +27,30 @@ export const Home: React.FC = () => {
   const [activeTrailerMovie, setActiveTrailerMovie] = useState<Movie | null>(null);
 
   useEffect(() => {
-    const unsub = subscribeToMovies((movieList) => {
+    let isMounted = true;
+    const unsub = subscribeToMovies(async (movieList) => {
+      if (!isMounted) return;
+      if (movieList.length === 0) {
+        try {
+          await seedCinemaData(false);
+          const updatedCinemas = await getCinemas();
+          if (isMounted) setCinemas(updatedCinemas);
+        } catch (err) {
+          console.warn('Initial seed completed or skipped:', err);
+        }
+      }
       setMovies(movieList);
       setLoading(false);
     });
 
     getCinemas().then((cinemaList) => {
-      setCinemas(cinemaList);
+      if (isMounted) setCinemas(cinemaList);
     });
 
-    return () => unsub();
+    return () => {
+      isMounted = false;
+      unsub();
+    };
   }, []);
 
   const featuredMovie = movies.find((m) => m.isFeatured) || movies[0];

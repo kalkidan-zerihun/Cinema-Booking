@@ -20,7 +20,7 @@ import { getHallById } from './halls';
 const RESERVATIONS_COLLECTION = 'reservations';
 const RESERVATION_SEATS_COLLECTION = 'reservationSeats';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
 
 async function getAuthToken(): Promise<string> {
   const currentUser = auth.currentUser;
@@ -30,8 +30,17 @@ async function getAuthToken(): Promise<string> {
   return await currentUser.getIdToken();
 }
 
+function generateBookingCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = 'KC-';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 /**
- * ATOMIC, SERVER-VERIFIED RESERVATION CREATION
+ * ATOMIC, SERVER-VERIFIED RESERVATION CREATION WITH FIRESTORE FALLBACK
  */
 export const createReservationAtomic = async (params: {
   showtimeId: string;
@@ -43,21 +52,114 @@ export const createReservationAtomic = async (params: {
     throw new Error('Please select at least one seat to proceed.');
   }
 
-  const token = await getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/reservations`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(params),
-  });
-
-  const data = await response.json();
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || 'Failed to create reservation. Please try again.');
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error('Authentication required to make a reservation.');
   }
-  return data.data as Reservation;
+
+  try {
+    const token = await currentUser.getIdToken();
+    const response = await fetch(`${API_BASE_URL}/reservations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data as Reservation;
+      }
+    }
+  } catch (apiErr) {
+    console.warn('Backend reservation API call failed, falling back to direct Firestore transaction:', apiErr);
+  }
+
+  // Client-side atomic transaction fallback
+  const uniqueSeatIds = Array.from(new Set(params.seatIds));
+  return await runTransaction(db, async (tx) => {
+    const showtimeRef = doc(db, 'showtimes', params.showtimeId);
+    const showtimeSnap = await tx.get(showtimeRef);
+    if (!showtimeSnap.exists()) {
+      throw new Error('Showtime not found or has been removed.');
+    }
+    const showtime = showtimeSnap.data()!;
+    const hallId = showtime.hallId;
+    const ticketPrice = Number(showtime.ticketPrice) || 250;
+
+    const seatSnaps = await Promise.all(
+      uniqueSeatIds.map((id) => tx.get(doc(db, 'seats', id)))
+    );
+    const seatLabels: string[] = [];
+    let calculatedTotalPrice = 0;
+
+    for (let i = 0; i < uniqueSeatIds.length; i++) {
+      const seatSnap = seatSnaps[i];
+      if (!seatSnap.exists()) {
+        throw new Error(`Seat ${uniqueSeatIds[i]} does not exist.`);
+      }
+      const seat = seatSnap.data()!;
+      seatLabels.push(seat.label || `${seat.row}${seat.number}`);
+      const priceModifier = Number(seat.priceModifier) || 1.0;
+      calculatedTotalPrice += Math.round(ticketPrice * priceModifier);
+    }
+
+    const now = Date.now();
+    const resSeatRefs = uniqueSeatIds.map((seatId) =>
+      doc(db, RESERVATION_SEATS_COLLECTION, `${params.showtimeId}_${seatId}`)
+    );
+    const resSeatSnaps = await Promise.all(resSeatRefs.map((ref) => tx.get(ref)));
+
+    for (let i = 0; i < resSeatSnaps.length; i++) {
+      const snap = resSeatSnaps[i];
+      if (!snap.exists()) continue;
+      const data = snap.data()!;
+      const stillActive =
+        data.status === 'RESERVED' &&
+        (!data.expiresAt || new Date(data.expiresAt).getTime() > now);
+      if (stillActive) {
+        throw new Error(`Seat ${seatLabels[i] || uniqueSeatIds[i]} is no longer available.`);
+      }
+    }
+
+    const newResRef = doc(collection(db, RESERVATIONS_COLLECTION));
+    const nowIso = new Date(now).toISOString();
+    const expiresAt = new Date(now + 15 * 60 * 1000).toISOString();
+    const bookingCode = generateBookingCode();
+
+    const reservationPayload = {
+      userId: currentUser.uid,
+      showtimeId: params.showtimeId,
+      status: 'PENDING' as const,
+      totalPrice: calculatedTotalPrice,
+      seatIds: uniqueSeatIds,
+      seatLabels,
+      customerName: params.customerName || currentUser.displayName || 'Cinema Guest',
+      customerEmail: params.customerEmail || currentUser.email || '',
+      bookingCode,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      expiresAt,
+    };
+
+    tx.set(newResRef, reservationPayload);
+
+    for (let i = 0; i < uniqueSeatIds.length; i++) {
+      tx.set(resSeatRefs[i], {
+        reservationId: newResRef.id,
+        seatId: uniqueSeatIds[i],
+        showtimeId: params.showtimeId,
+        status: 'RESERVED',
+        createdAt: nowIso,
+        expiresAt,
+      });
+    }
+
+    return { id: newResRef.id, ...reservationPayload };
+  });
 };
 
 /**

@@ -11,27 +11,40 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Cinema } from '../types';
+import { INITIAL_CINEMAS } from './seedData';
 
 const COLLECTION_NAME = 'cinemas';
 
 export const getCinemas = async (): Promise<Cinema[]> => {
-  const snapshot = await getDocs(collection(db, COLLECTION_NAME));
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  })) as Cinema[];
+  try {
+    const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+    if (snapshot.empty) return INITIAL_CINEMAS;
+    return snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as Cinema[];
+  } catch (err) {
+    console.warn('Using fallback cinemas data:', err);
+    return INITIAL_CINEMAS;
+  }
 };
 
 export const getCinemaById = async (cinemaId: string): Promise<Cinema | null> => {
-  const docRef = doc(db, COLLECTION_NAME, cinemaId);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return {
-      id: docSnap.id,
-      ...docSnap.data(),
-    } as Cinema;
+  try {
+    const docRef = doc(db, COLLECTION_NAME, cinemaId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data(),
+      } as Cinema;
+    }
+    const fallback = INITIAL_CINEMAS.find((c) => c.id === cinemaId);
+    return fallback || null;
+  } catch {
+    const fallback = INITIAL_CINEMAS.find((c) => c.id === cinemaId);
+    return fallback || null;
   }
-  return null;
 };
 
 export const createCinema = async (cinemaData: Omit<Cinema, 'id'>): Promise<string> => {
@@ -60,14 +73,19 @@ export const subscribeToCinemas = (callback: (cinemas: Cinema[]) => void) => {
   return onSnapshot(
     collection(db, COLLECTION_NAME),
     (snapshot) => {
-      const cinemas = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as Cinema[];
-      callback(cinemas);
+      if (snapshot.empty) {
+        callback(INITIAL_CINEMAS);
+      } else {
+        const cinemas = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as Cinema[];
+        callback(cinemas);
+      }
     },
     (error) => {
-      console.error('Error subscribing to cinemas:', error);
+      console.warn('Error subscribing to cinemas, using fallback:', error);
+      callback(INITIAL_CINEMAS);
     }
   );
 };

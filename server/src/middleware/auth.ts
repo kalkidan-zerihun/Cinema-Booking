@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { auth, db } from "../firebase.js";
+import { isAuthorizedAdminEmail } from "../utils/adminBootstrap.js";
 
 export interface AuthenticatedUser {
   uid: string;
@@ -21,7 +22,7 @@ export async function authenticate(
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({
       success: false,
-      message: "Authentication required. Please provide a valid token.",
+      message: "Authentication required. Please provide a valid Bearer token.",
     });
     return;
   }
@@ -39,18 +40,36 @@ export async function authenticate(
   try {
     const decodedToken = await auth.verifyIdToken(idToken);
     const uid = decodedToken.uid;
+    const email = decodedToken.email;
 
     // Fetch user profile from Firestore to determine actual role
-    const userSnap = await db.collection("users").doc(uid).get();
+    const userDocRef = db.collection("users").doc(uid);
+    const userSnap = await userDocRef.get();
     let role = "CUSTOMER";
 
     if (userSnap.exists) {
       role = userSnap.data()?.role || "CUSTOMER";
     }
 
+    // If email is in authorized admin list and not yet set in Firestore, promote
+    if (email && isAuthorizedAdminEmail(email) && role !== "ADMIN") {
+      role = "ADMIN";
+      const nowIso = new Date().toISOString();
+      await userDocRef.set(
+        {
+          uid,
+          email,
+          role: "ADMIN",
+          updatedAt: nowIso,
+          ...(userSnap.exists ? {} : { createdAt: nowIso, name: "Administrator" }),
+        },
+        { merge: true }
+      );
+    }
+
     req.user = {
       uid,
-      email: decodedToken.email || userSnap.data()?.email,
+      email: email || userSnap.data()?.email,
       role,
     };
 

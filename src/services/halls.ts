@@ -13,36 +13,56 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Hall } from '../types';
+import { INITIAL_HALLS } from './seedData';
 
 const COLLECTION_NAME = 'halls';
 
 export const getHalls = async (): Promise<Hall[]> => {
-  const snapshot = await getDocs(collection(db, COLLECTION_NAME));
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  })) as Hall[];
+  try {
+    const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+    if (snapshot.empty) return INITIAL_HALLS;
+    return snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as Hall[];
+  } catch (err) {
+    console.warn('Using fallback halls:', err);
+    return INITIAL_HALLS;
+  }
 };
 
 export const getHallsByCinemaId = async (cinemaId: string): Promise<Hall[]> => {
-  const q = query(collection(db, COLLECTION_NAME), where('cinemaId', '==', cinemaId));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  })) as Hall[];
+  try {
+    const q = query(collection(db, COLLECTION_NAME), where('cinemaId', '==', cinemaId));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      return INITIAL_HALLS.filter((h) => h.cinemaId === cinemaId);
+    }
+    return snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as Hall[];
+  } catch {
+    return INITIAL_HALLS.filter((h) => h.cinemaId === cinemaId);
+  }
 };
 
 export const getHallById = async (hallId: string): Promise<Hall | null> => {
-  const docRef = doc(db, COLLECTION_NAME, hallId);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return {
-      id: docSnap.id,
-      ...docSnap.data(),
-    } as Hall;
+  try {
+    const docRef = doc(db, COLLECTION_NAME, hallId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data(),
+      } as Hall;
+    }
+    const fallback = INITIAL_HALLS.find((h) => h.id === hallId);
+    return fallback || null;
+  } catch {
+    const fallback = INITIAL_HALLS.find((h) => h.id === hallId);
+    return fallback || null;
   }
-  return null;
 };
 
 export const createHall = async (hallData: Omit<Hall, 'id'>): Promise<string> => {

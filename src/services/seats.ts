@@ -14,20 +14,45 @@ import { Seat, SeatType } from '../types';
 const COLLECTION_NAME = 'seats';
 
 export const getSeatsByHallId = async (hallId: string): Promise<Seat[]> => {
-  const q = query(collection(db, COLLECTION_NAME), where('hallId', '==', hallId));
-  const snapshot = await getDocs(q);
-  const seats = snapshot.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  })) as Seat[];
+  try {
+    const q = query(collection(db, COLLECTION_NAME), where('hallId', '==', hallId));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const seats = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Seat[];
 
-  // Sort seats logically: by Row letter ascending (A, B, C...), then by Number ascending (1, 2, 3...)
-  return seats.sort((a, b) => {
-    if (a.row === b.row) {
-      return a.number - b.number;
+      return seats.sort((a, b) => {
+        if (a.row === b.row) {
+          return a.number - b.number;
+        }
+        return a.row.localeCompare(b.row);
+      });
     }
-    return a.row.localeCompare(b.row);
-  });
+  } catch (err) {
+    console.warn('Error fetching seats from Firestore, generating fallback:', err);
+  }
+
+  // Generate fallback seats
+  const rowLetters = ['A', 'B', 'C', 'D'];
+  const fallbackSeats: Seat[] = [];
+  for (let r = 0; r < rowLetters.length; r++) {
+    const row = rowLetters[r];
+    const isVip = r === rowLetters.length - 1;
+    for (let num = 1; num <= 6; num++) {
+      fallbackSeats.push({
+        id: `${hallId}_${row}${num}`,
+        hallId,
+        row,
+        number: num,
+        label: `${row}${num}`,
+        type: isVip ? 'VIP' : 'STANDARD',
+        priceModifier: isVip ? 1.25 : 1.0,
+      });
+    }
+  }
+  return fallbackSeats;
 };
 
 export const updateSeat = async (id: string, data: Partial<Seat>): Promise<void> => {

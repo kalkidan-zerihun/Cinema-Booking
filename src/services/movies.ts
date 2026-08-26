@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Movie } from '../types';
+import { INITIAL_MOVIES } from './seedData';
 
 const COLLECTION_NAME = 'movies';
 
@@ -20,30 +21,43 @@ export const getMovies = async (): Promise<Movie[]> => {
   try {
     const q = query(collection(db, COLLECTION_NAME), orderBy('title', 'asc'));
     const snapshot = await getDocs(q);
+    if (snapshot.empty) return INITIAL_MOVIES;
     return snapshot.docs.map((d) => ({
       id: d.id,
       ...d.data(),
     })) as Movie[];
   } catch {
-    // If index isn't created or error, fallback to un-ordered query
-    const snapshot = await getDocs(collection(db, COLLECTION_NAME));
-    return snapshot.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    })) as Movie[];
+    try {
+      // If index isn't created or error, fallback to un-ordered query
+      const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+      if (snapshot.empty) return INITIAL_MOVIES;
+      return snapshot.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Movie[];
+    } catch (err) {
+      console.warn('Using fallback movies data:', err);
+      return INITIAL_MOVIES;
+    }
   }
 };
 
 export const getMovieById = async (movieId: string): Promise<Movie | null> => {
-  const docRef = doc(db, COLLECTION_NAME, movieId);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return {
-      id: docSnap.id,
-      ...docSnap.data(),
-    } as Movie;
+  try {
+    const docRef = doc(db, COLLECTION_NAME, movieId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data(),
+      } as Movie;
+    }
+    const fallback = INITIAL_MOVIES.find((m) => m.id === movieId);
+    return fallback || null;
+  } catch (err) {
+    const fallback = INITIAL_MOVIES.find((m) => m.id === movieId);
+    return fallback || null;
   }
-  return null;
 };
 
 export const createMovie = async (movieData: Omit<Movie, 'id'>): Promise<string> => {
@@ -73,14 +87,19 @@ export const subscribeToMovies = (callback: (movies: Movie[]) => void) => {
   return onSnapshot(
     q,
     (snapshot) => {
-      const movies = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as Movie[];
-      callback(movies);
+      if (snapshot.empty) {
+        callback(INITIAL_MOVIES);
+      } else {
+        const movies = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as Movie[];
+        callback(movies);
+      }
     },
     (error) => {
-      console.error('Error subscribing to movies:', error);
+      console.warn('Error subscribing to movies, falling back to initial data:', error);
+      callback(INITIAL_MOVIES);
     }
   );
 };
