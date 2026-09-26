@@ -1,0 +1,8 @@
+{
+  "name": "Cinema - Movie Ticket Reservation & Seat Selection Platform",
+  "description": "Real-time online movie ticket reservation and interactive seat selection platform for local cinemas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

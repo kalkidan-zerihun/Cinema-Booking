@@ -1,0 +1,12 @@
+{
+  "projectId": "kali-cinema-booking",
+  "appId": "1:379812560791:web:60cbd0c870fca87c640ed2",
+  "apiKey": "AIzaSyCGNmVSmuinIxGtIS4KX6RnrzAvO46XdVI",
+  "authDomain": "kali-cinema-booking.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "kali-cinema-booking.firebasestorage.app",
+  "messagingSenderId": "379812560791",
+  "measurementId": "",
+  "oAuthClientId": "",
+  "recaptchaSiteKey": ""
+}

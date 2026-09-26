@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------
+    // Helpers
+    // ----------------------------------------------------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+
+    // ----------------------------------------------------------------
+    // Users
+    // ----------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) &&
+        (!('role' in request.resource.data) || request.resource.data.role == 'CUSTOMER');
+      allow update: if (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
+    // Public catalog data — readable by everyone, writable only by administrators
+    // ----------------------------------------------------------------
+    match /movies/{movieId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /cinemas/{cinemaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /halls/{hallId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /seats/{seatId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /showtimes/{showtimeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
+    // Reservations — Server Authoritative (Express Admin SDK handles writes)
+    // ----------------------------------------------------------------
+    match /reservations/{reservationId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ----------------------------------------------------------------
+    // ReservationSeats — Realtime public read for seat map, client writes denied
+    // ----------------------------------------------------------------
+    match /reservationSeats/{reservationSeatId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ----------------------------------------------------------------
+    // Payments — Server Authoritative (Express Admin SDK handles writes)
+    // ----------------------------------------------------------------
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ----------------------------------------------------------------
+    // Audit Logs — Server Authoritative (Admin SDK only)
+    // ----------------------------------------------------------------
+    match /audit_logs/{logId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

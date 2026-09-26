@@ -1,0 +1,207 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered customer and administrator accounts",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["CUSTOMER", "ADMIN"] },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Movie": {
+      "title": "Movie",
+      "description": "Cinema movie listing and metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "number" },
+        "genre": { "type": "string" },
+        "releaseDate": { "type": "string" },
+        "posterUrl": { "type": "string" },
+        "backdropUrl": { "type": "string" },
+        "trailerUrl": { "type": "string" },
+        "rating": { "type": "number" },
+        "ageRating": { "type": "string" },
+        "language": { "type": "string" },
+        "director": { "type": "string" },
+        "cast": { "type": "array" },
+        "isFeatured": { "type": "boolean" },
+        "isNowShowing": { "type": "boolean" },
+        "isComingSoon": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "duration", "genre"]
+    },
+    "Cinema": {
+      "title": "Cinema",
+      "description": "Cinema multiplex branch venue",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "address": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "phone": { "type": "string" },
+        "amenities": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "location"]
+    },
+    "Hall": {
+      "title": "Hall",
+      "description": "Auditorium screening room in a cinema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "cinemaId": { "type": "string" },
+        "name": { "type": "string" },
+        "capacity": { "type": "number" },
+        "screenType": { "type": "string" },
+        "soundSystem": { "type": "string" },
+        "totalRows": { "type": "number" },
+        "seatsPerRow": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "cinemaId", "name", "capacity"]
+    },
+    "Seat": {
+      "title": "Seat",
+      "description": "Physical auditorium chair definition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "hallId": { "type": "string" },
+        "row": { "type": "string" },
+        "number": { "type": "number" },
+        "label": { "type": "string" },
+        "type": { "type": "string" },
+        "priceModifier": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "hallId", "row", "number"]
+    },
+    "Showtime": {
+      "title": "Showtime",
+      "description": "Movie screening schedule session in a hall",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "movieId": { "type": "string" },
+        "cinemaId": { "type": "string" },
+        "hallId": { "type": "string" },
+        "date": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "ticketPrice": { "type": "number" },
+        "format": { "type": "string" },
+        "language": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "movieId", "cinemaId", "hallId", "date", "startTime", "ticketPrice"]
+    },
+    "Reservation": {
+      "title": "Reservation",
+      "description": "Customer movie ticket booking transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingCode": { "type": "string" },
+        "userId": { "type": "string" },
+        "showtimeId": { "type": "string" },
+        "seatIds": { "type": "array" },
+        "seatLabels": { "type": "array" },
+        "totalPrice": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "CONFIRMED", "CANCELLED"] },
+        "paymentMethod": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "bookingCode", "userId", "showtimeId", "seatIds", "totalPrice", "status"]
+    },
+    "ReservationSeat": {
+      "title": "ReservationSeat",
+      "description": "Real-time seat reservation lock per showtime session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reservationId": { "type": "string" },
+        "showtimeId": { "type": "string" },
+        "seatId": { "type": "string" },
+        "seatLabel": { "type": "string" },
+        "status": { "type": "string", "enum": ["HELD", "BOOKED", "AVAILABLE"] },
+        "userId": { "type": "string" },
+        "expiresAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reservationId", "showtimeId", "seatId", "status"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Transaction payment record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reservationId": { "type": "string" },
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "status": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reservationId", "userId", "amount", "currency", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Registered user profile records"
+    },
+    "/movies/{movieId}": {
+      "schema": "Movie",
+      "description": "Movie catalog items"
+    },
+    "/cinemas/{cinemaId}": {
+      "schema": "Cinema",
+      "description": "Cinema branch locations"
+    },
+    "/halls/{hallId}": {
+      "schema": "Hall",
+      "description": "Cinema auditorium halls"
+    },
+    "/seats/{seatId}": {
+      "schema": "Seat",
+      "description": "Auditorium seats"
+    },
+    "/showtimes/{showtimeId}": {
+      "schema": "Showtime",
+      "description": "Scheduled movie showtimes"
+    },
+    "/reservations/{reservationId}": {
+      "schema": "Reservation",
+      "description": "User ticket reservations"
+    },
+    "/reservationSeats/{reservationSeatId}": {
+      "schema": "ReservationSeat",
+      "description": "Seat lock occupancy tracking per showtime"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Payment records"
+    }
+  }
+}

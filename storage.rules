@@ -1,0 +1,31 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+
+    // The app currently stores posters/backdrops as external URLs and does
+    // not upload files to Storage. This bucket is provisioned but unused;
+    // rules default-deny everything except a namespaced, admin-only,
+    // size/type-limited path for future poster/backdrop uploads so the
+    // bucket is never left wide open.
+    match /admin-uploads/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
